@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="js/randomColor.js"></script>
+    <script src="js/leaflet.js"></script>
+    <script src="js/Leaflet.MakiMarkers.js"></script>
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="js/mapvisualizer.js"></script>
+
+    <link rel="stylesheet" href="css/leaflet.css"/>
+    <link rel="stylesheet" href="css/visualizer.css"/>
+  </head>
+  <body>
+    <div>
+      <div id="mapid"></div>
+      <textarea id="maplogs" readonly></textarea>
+    </div>
+    <div>
+      <div>Plan navigation</div>
+      <button id="back-timestamp-button" type="button">Back</button>
+      <button id="next-timestamp-button" type="button">Next</button>
+      <button id="play-timestamp-button" type="button">Play</button>
+      <button id="restart-timestamp-button" type="button">Restart</button>
+    </div>
+    <br>
+    <div>
+      <div>Map edition</div>
+      <div>
+        <button id="toggle-block-random-link-button" type="button">Toggle block random link</button>
+        <input id="num-block-random-link" type="number" value="0">
+      </div>
+      <div>
+        <button id="toggle-block-planned-link-button" type="button">Toggle block planned link</button>
+        <input id="num-block-planned-link" type="number" value="0">
+      </div>
+      <div>
+        <input id="toggle-block-link-on-step" type="checkbox" name="toggle-block-link-on-step">
+        <label for="toggle-block-link-on-step">Toggle block planned link on step with probability</label>
+        <input id="toggling-probability" type="number" min="0" max="100" step="1" value="0">
+        <span>%</span>
+      </div>
+    </div>
+    <br>
+    <div>
+      <button id="send-current-state-button" type="button">Send current state</button>
+    </div>
+  </body>
+</html>

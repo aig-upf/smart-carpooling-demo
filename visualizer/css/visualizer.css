@@ -1,0 +1,33 @@
+.legend {
+	background: rgba(255, 255, 255, 0.75);
+	padding: 5px;
+}
+
+#mapid {
+	width: 75%;
+	height: 450px;
+	display: inline-block;
+}
+
+#maplogs {
+	width: 20%;
+	height: 450px;
+	max-width: 600px;
+	max-height: 450px;
+	display: inline-block;
+}
+
+.legend-item {
+	min-width: 83%;
+	position: absolute;
+	text-align: center;
+}
+
+#back-timestamp-button {
+	display: none;
+}
+
+#num-block-random-link, #num-block-planned-link, #toggling-probability {
+	width: 50px;
+	text-align: right;
+}
