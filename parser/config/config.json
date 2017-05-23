@@ -1,0 +1,30 @@
+{
+	"map_path": "../../trento/Trento.world",
+	"map_boundaries": {
+		"min_latitude": 46.0643,
+		"max_latitude": 46.0715,
+		"min_longitude": 11.1164,
+		"max_longitude": 11.1272
+	},
+	"pedestrians": [
+		{
+			"id": "p1",
+			"init_pos": "osm:node:955281012",
+			"target_pos": "osm:node:1271504842",
+			"walk_range": 50
+		},
+		{
+			"id": "p2",
+			"init_pos": "vehicle:c1",
+			"target_pos": "osm:node:257352083",
+			"walk_range": 10
+		}
+	],
+	"carpools": [
+		{
+			"id": "c1",
+			"init_pos": "osm:node:430669782",
+			"target_pos": "osm:node:430669782"
+		}
+	]
+}
