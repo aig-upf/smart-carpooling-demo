@@ -44,6 +44,38 @@ pip install flask flask-cors geopy parse queuelib
 
 ### <a name="run-default-example"></a>Running a simple example
 
+Mobility problems are specified using the JSON format. These problems are later converted into PDDL problems that can be solved by a temporal planner. A mobility problem written as JSON specifies the following fields:
+
+* `map_path` - the path to the input OpenStreetMap.
+* `map_boundaries` - object containing defining a rectangular area to analyse inside the map:
+	* `min_latitude` - minimum latitude.
+	* `max_latitude` - maximum latitude.
+	* `min_longitude` - minimum longitude.
+	* `max_longitude` - maximum longitude.
+* `pedestrians` - list of the pedestrians/passengers in the problem. Each contains the following fields:
+	* `id` - a unique identifier.
+	* `init_pos` - OSM label of its initial position.
+	* `target_pos` - OSM label of its target position.
+	* `walk_range` - maximum distance it can walk away from its origin and target positions.
+* `carpools` - list of carpools in the problem. Each contains the following fields:
+	* `id` - a unique identifier.
+	* `init_pos` - OSM label of its initial position.
+	* `target_pos` - OSM label of its target position. 
+* `blocked_streets` - list of blocked streets in the problem. Each contains the following fields:
+	* `init_pos` - OSM label of its initial position.
+	* `target_pos` - OSM label of its target position.
+* `blocked_frontiers` - list of blocked frontiers. Each frontier is either specifies the field `latitude` or the field `longitude`.
+All the streets crossing that frontier become blocked in the planning problem.
+
+
+To test if everything has been correctly installed, you can run a simple example using a configuration file placed in `parser/config`. You just have to open the `smart-carpooling-demo` folder and run the following command:
+
+```
+./parser/parser.py --plan --json --visualize  parser/config/config.json
+```
+
+By running the previous command, 
+
 ### <a name="run-cae"></a>Running the Collective Adaptation Engine
 
 ## <a name="credits"></a>Credits
