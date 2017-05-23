@@ -6,6 +6,8 @@ This documentation aims to explain how the planning experiments in the *smart mo
 	1. [Planning Environment](#planning-environment)
 	1. [Python Libraries](#python-libraries)
 1. [Usage](#usage)
+	1. [Running a simple example](#run-default-example)
+	1. [Running the Collective Adaptation Engine](#run-cae)
 1. [Credits](#credits)
 1. [References](#references)
 
@@ -30,13 +32,19 @@ The installation of the following Python libraries is required to execute the to
 * [Flask](http://flask.pocoo.org/docs/0.12/quickstart/)
 * [Flask-CORS](https://flask-cors.readthedocs.io/en/latest/)
 * [geopy](https://pypi.python.org/pypi/geopy)
+* [parse](https://pypi.python.org/pypi/parse)
+* [queuelib](https://pypi.python.org/pypi/queuelib)
 
 You can install all of them at once using the following command:
 ```
-pip install flask flask-cors geopy
+pip install flask flask-cors geopy parse queuelib
 ```
 
 ## <a name="usage"></a>Usage
+
+### <a name="run-default-example"></a>Running a simple example
+
+### <a name="run-cae"></a>Running the Collective Adaptation Engine
 
 ## <a name="credits"></a>Credits
 
