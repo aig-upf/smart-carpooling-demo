@@ -4,7 +4,7 @@ This documentation aims to explain how the planning experiments in the *smart mo
 
 1. [Installation](#installation)
 	1. [Planning Environment](#planning-environment)
-  1. [Python Libraries](#python-libraries)
+	1. [Python Libraries](#python-libraries)
 1. [Usage](#usage)
 1. [Credits](#credits)
 1. [References](#references)
