@@ -8,6 +8,7 @@ This documentation aims to explain how the planning experiments in the *smart mo
 1. [Usage](#usage)
 	1. [Running a simple example](#run-default-example)
 	1. [Running the Collective Adaptation Engine](#run-cae)
+	1. [Creating Smart Mobility Problems](#create-sm-problems)
 1. [Credits](#credits)
 1. [References](#references)
 
@@ -43,7 +44,39 @@ pip install flask flask-cors geopy parse queuelib
 ## <a name="usage"></a>Usage
 
 ### <a name="run-default-example"></a>Running a simple example
+To test if everything has been correctly installed, you can follow this section. The file you will be running is called `parser.py` (inside the `parser` folder):
 
+```
+parser.py [-h] [--plan] [--json] [--visualize] [--time TIME] [--memory MEMORY] config
+``` 
+
+where:
+
+* `-h` - shows help.
+* `--plan` - whether the planner has to be executed.
+* `--json` - whether the solution has to be converted into JSON format.
+* `--visualize` - whether to run the local web server that allows the plan to be visualized.
+* `--time` - the amount of time (in seconds) during which the planner will run. Default: 3600s.
+* `--memory` - the maximum amount of memory (in MiB) used by the planner. Default: 4096 MiB.
+* `config` - the path to a configuration/problem file. The format of these files is explained [here](#create-sm-problems).
+
+You can use the configuration file `config.json` placed in `parser/config`. You just have to open the `smart-carpooling-demo` folder and run the following command:
+
+```
+./parser/parser.py --plan --json --visualize  parser/config/config.json
+```
+
+By running the previous command, you will see the following process:
+
+1. The input map is parsed.
+1. The planner starts and will stop as soon as a solution is found or one of the previous time/memory criterias is met.
+1. If there is a solution, it will be converted into JSON format (see file `tmp_sas_plan.json`).
+1. If there is a solution, a web server will be launched to serve the content for displaying the map. To see the map, just open the `index.html` file inside the `visualizer` folder (Google Chrome recommended). In 10 seconds,
+the map will be displayed and the web server will close automatically.
+
+### <a name="run-cae"></a>Running the Collective Adaptation Engine
+
+### <a name="create-sm-problems"></a>Creating Smart Mobility Problems
 Mobility problems are specified using the JSON format. These problems are later converted into PDDL problems that can be solved by a temporal planner. A mobility problem written as JSON specifies the following fields:
 
 * `map_path` - the path to the input OpenStreetMap.
@@ -52,6 +85,7 @@ Mobility problems are specified using the JSON format. These problems are later 
 	* `max_latitude` - maximum latitude.
 	* `min_longitude` - minimum longitude.
 	* `max_longitude` - maximum longitude.
+* `solution_type` - specifies whether the solution must be `collective` (agents may interact) or `selfish` (agents cannot interact).
 * `pedestrians` - list of the pedestrians/passengers in the problem. Each contains the following fields:
 	* `id` - a unique identifier.
 	* `init_pos` - OSM label of its initial position.
@@ -67,16 +101,7 @@ Mobility problems are specified using the JSON format. These problems are later 
 * `blocked_frontiers` - list of blocked frontiers. Each frontier is either specifies the field `latitude` or the field `longitude`.
 All the streets crossing that frontier become blocked in the planning problem.
 
-
-To test if everything has been correctly installed, you can run a simple example using a configuration file placed in `parser/config`. You just have to open the `smart-carpooling-demo` folder and run the following command:
-
-```
-./parser/parser.py --plan --json --visualize  parser/config/config.json
-```
-
-By running the previous command, 
-
-### <a name="run-cae"></a>Running the Collective Adaptation Engine
+You can find examples of these files inside the `parser/config` folder.
 
 ## <a name="credits"></a>Credits
 
