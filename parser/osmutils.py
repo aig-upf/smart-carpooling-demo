@@ -1,5 +1,8 @@
 import geopy.distance
-from queue import Queue
+try:
+    from queue import Queue
+except:
+    from Queue import Queue
 
 class OpenStreeMapNode:
     def __init__(self, id, name, latitude, longitude):
