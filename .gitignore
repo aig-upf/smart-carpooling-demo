@@ -5,4 +5,5 @@
 *.synctex.gz
 *.pyc
 *.class
-CollectiveAdaptationEngine/bin
+collective_adaptation_engine/bin
+/bin/
