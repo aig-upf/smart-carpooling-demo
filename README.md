@@ -9,6 +9,7 @@ This documentation aims to explain how the planning experiments in the *smart mo
 	1. [Running a simple example](#run-default-example)
 	1. [Running the Collective Adaptation Engine](#run-cae)
 	1. [Creating Smart Mobility Problems](#create-sm-problems)
+	1. [Plan visualization and creation of issues](#visualization-and-issue-creation)
 1. [Credits](#credits)
 1. [References](#references)
 
@@ -126,6 +127,21 @@ All the streets crossing that frontier become blocked in the planning problem.
 You can find examples of these files inside the `parser/config` folder.
 
 ### <a name="visualization-and-issue-creation"></a>Plan visualization and creation of issues
+The visualizer allows plans to be displayed and also to introduce and remove issues. The following list shows what each of the navigation buttons does:
+
+* `Play` - each of step in the plan is automatically displayed one after the other. Each state is shown for one second.
+* `Pause` - stops the automatic displaying of the plan.
+* `Step` - shows the next state in the plan.
+* `Restart` - resets the visualizer to the first state (blocked streets are kept).
+
+The issues (by now, blocked streets) can be removed or added by clicking on the desired street. Besides, they can be added or removed using the following buttons:
+
+* `Toggle block random link` - adds or removes N random links specified in the textbox. These links are selected from the whole set of links.
+* `Toggle block planned links` - adds or removes N random links specified in the textbox. These links are selected from the set of used links in the plan.
+* `Toggle block planned link on step with probability X%` - at each step, a planned link toggles its block state with the probability specified in the checkbox.
+
+Finally, for an issue to be solved, the `Send current state` button is used.
+
 ![Image of the visualizer](doc/img/visualiser_full.png)
 
 ## <a name="credits"></a>Credits
