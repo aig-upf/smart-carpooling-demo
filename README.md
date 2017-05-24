@@ -125,6 +125,9 @@ All the streets crossing that frontier become blocked in the planning problem.
 
 You can find examples of these files inside the `parser/config` folder.
 
+### <a name="visualization-and-issue-creation"></a>Plan visualization and creation of issues
+![Image of the visualizer](doc/img/visualiser_full.png)
+
 ## <a name="credits"></a>Credits
 
 The code for creating and solving smart mobility problems has been written by:
