@@ -4,7 +4,10 @@ import argparse
 import json
 from osmutils import *
 from random import randint
-from queue import Queue
+try:
+    from queue import Queue
+except:
+    from Queue import Queue
 
 
 def getArguments():
