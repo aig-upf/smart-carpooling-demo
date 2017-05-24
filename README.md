@@ -76,6 +76,28 @@ the map will be displayed and the web server will close automatically.
 
 ### <a name="run-cae"></a>Running the Collective Adaptation Engine
 
+The Collective Adaptation Engine (CAE) code is contained inside the `collective-adaptation-engine` folder. It is written in Java and it requires version 8 to run. You can directly import this folder from Eclipse.
+
+This module automatically calls all the previous modules described in the [previous section](#run-default-example). The class you need to run to is `CollectiveMobility.java`.
+The execution consists of several runs. Each run follows this process:
+
+1. An initial random state is created.
+1. The state is sent to the planner to get a collective solution.
+1. Once a solution is obtained, an adaptation issue is introduced.
+1. The issue is resolved in two ways: selfishly and collectively.
+1. Statistics are collected from both the selfish and collective plans.
+
+Once all runs have been executed, the overall statistics are exported to two files: `dataEvaluationCollective.csv`
+and `dataEvaluationSelfish.csv`. The meaning of their columns is the following:
+
+* `id` - number of run.
+* `dv1` - number of vehicles involved.
+* `dv2` - number of passenger involved.
+* `dv3` - execution time of the adaptation.
+* `dv4` - average of meters done by vehicles.
+* `dv5` - average of meters done by passengers walking.
+* `dv6` - total number of used agents used including the car pool company.
+
 ### <a name="create-sm-problems"></a>Creating Smart Mobility Problems
 Mobility problems are specified using the JSON format. These problems are later converted into PDDL problems that can be solved by a temporal planner. A mobility problem written as JSON specifies the following fields:
 
