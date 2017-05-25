@@ -148,6 +148,7 @@ public class CollectiveMobility {
 				// Ensemble Creation using Randominit.py
 				String scriptPath = WORKING_DIR_NAME + "/parser/";
 				String worldPath = WORKING_DIR_NAME + "/trento/";
+				String carDataPath = WORKING_DIR_NAME + "/trento/cardata.xlsx";
 
 				boolean created = false;
 				// while (!created) {
@@ -178,7 +179,7 @@ public class CollectiveMobility {
 				System.out.println("Config: " + "--Ensembles: "
 						+ NumOfEnsembles + "--Passengers: " + NumOfPassengers);
 
-				created = createEnsembles(scriptPath, worldPath,
+				created = createEnsembles(scriptPath, worldPath, carDataPath,
 						NumOfPassengers, NumOfEnsembles);
 				// read the plan result and generates the Ensemble for the
 				// execution
@@ -1673,7 +1674,7 @@ public class CollectiveMobility {
 		return null;
 	}
 
-	private static boolean createEnsembles(String scriptPath, String worldPath,
+	private static boolean createEnsembles(String scriptPath, String worldPath, String carDataPath,
 			int passengers, int ensembles) {
 
 		boolean result = false;
@@ -1689,8 +1690,8 @@ public class CollectiveMobility {
 		// + "Trento.world " + passengers + " " + ensembles + " "
 		// + "46.0643 46.0715 11.1164 11.1272 0 100";
 		// MORE KMS
-		String planCmd = "python " + scriptPath + "randominit.py " + worldPath
-				+ "Trento.world " + passengers + " " + ensembles + " " + minlat
+		String planCmd = "python " + scriptPath + "randominit.py --carinfo " + carDataPath
+				+ " " + worldPath + "Trento.world " + passengers + " " + ensembles + " " + minlat
 				+ " " + maxlat + " " + minlng + " " + maxlng + " " + "0 100";
 		System.out.println(planCmd);
 		try {
