@@ -71,7 +71,7 @@ def getLinksInWalkRange(currentNode, linksList, remainingDistance, visitedNodeId
                     getLinksInWalkRange(link.getLinkedNode(), linksList, newRemainingDistance, visitedNodeIds)
 
 
-def getPedestrians(regionNodes, numPedestrians):
+def getPedestrians(regionNodes, numPedestrians, carsInfomation):
     pedestrians = []
     pedestrianLinks = []
     pedestrianNodeIds = set()
@@ -82,7 +82,10 @@ def getPedestrians(regionNodes, numPedestrians):
         randomDestNode = regionNodes[randint(0, len(regionNodes) - 1)]
         walkRange = randint(args.minwalk, args.maxwalk)
 
-        pedestrians.append({"id": pedestrianId, "init_pos": randomOriginNode.getName(), "target_pos": randomDestNode.getName(), "walk_range": walkRange})
+        pedestrian = {"id": pedestrianId, "init_pos": randomOriginNode.getName(), "target_pos": randomDestNode.getName(), "walk_range": walkRange}
+        if carsInfomation is not None:
+            pedestrian.update(carsInfomation.getRandomCar())
+        pedestrians.append(pedestrian)
 
         pedestrianNodeIdsMap[pedestrianId] = {}
 
@@ -137,7 +140,7 @@ if __name__ == "__main__":
 
     regionNodes = mapParser.getNodesForRegion(args.minlat, args.maxlat, args.minlon, args.maxlon)
 
-    pedestrians, pedestrianLinks, pedestrianNodeIds, pedestrianNodeIdsMap = getPedestrians(regionNodes, args.pedestrians)
+    pedestrians, pedestrianLinks, pedestrianNodeIds, pedestrianNodeIdsMap = getPedestrians(regionNodes, args.pedestrians, carsInfomation)
     carpools = getCarpools(regionNodes, args.carpools, pedestrianNodeIds, args.block_pedestrian_links, carsInfomation)
 
     finalObj = {"carpools": carpools, "pedestrians": pedestrians, "blocked_streets": []}
