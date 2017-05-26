@@ -28,22 +28,24 @@ public class MultiagentPlannerCaller {
 			 */
 			System.out.println("PLANNER CALL");
 			Process p = Runtime.getRuntime().exec(planCmd);
-
-			BufferedReader stdInput = new BufferedReader(new InputStreamReader(
-					p.getInputStream()));
-
-			BufferedReader stdError = new BufferedReader(new InputStreamReader(
-					p.getErrorStream()));
+			p.waitFor();
+			
+			/*
+			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 
 			String s = null;
 			while ((s = stdInput.readLine()) != null) {
-				// System.out.println(s);
+				System.out.println(s);
 			}
 
 			while ((s = stdError.readLine()) != null) {
-				// System.out.println(s);
+				System.out.println(s);
 			}
+			*/
 		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}

@@ -1696,17 +1696,18 @@ public class CollectiveMobility {
 		System.out.println(planCmd);
 		try {
 			// create random_init.json file with the ensembles configuration
-
 			Process p = Runtime.getRuntime().exec(planCmd);
+			p.waitFor();
 			// System.out.println(p.getOutputStream());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		
 		// read the init json file and create the respective ensembles
 		result = readJSONStartFile();
 		return result;
-
 	}
 
 	private static boolean readJSONStartFile() {
