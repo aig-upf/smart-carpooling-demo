@@ -23,6 +23,9 @@ def getArguments():
     argParser.add_argument("--time", "-t", default=3600, help="maximum number of seconds during which the planner will run (default: 3600 seconds)")
     argParser.add_argument("--memory", "-m", default=4096, help="maximum amount of memory in MiB to be used by the planner (default: 4096 MiB)")
     argParser.add_argument("--visualize", "-v", default=False, action="store_true", help="show a map with the planned route")
+    argParser.add_argument("--iterated", dest="iterated", action="store_true", help="look for more solutions after finding the first one")
+    argParser.add_argument("--no-iterated", dest="iterated", action="store_false", help="stop after finding the first solution")
+    argParser.set_defaults(iterated=False)
     return argParser.parse_args()
 
 
@@ -34,27 +37,37 @@ def parseConfigFile(configFilePath):
     return json.loads(jsonContent)
 
 
+def getPlanFileNames():
+    solFiles = [i for i in os.listdir(".") if i.startswith("tmp_sas_plan") and not i.endswith("json")]
+    solFiles.sort(reverse=True)
+    return solFiles
+
+
 def getLastPlanFileName():
-	solFiles = [i for i in os.listdir(".") if i.startswith("tmp_sas_plan") and not i.endswith("json")]
-	solFiles.sort(reverse=True)
-	if len(solFiles) == 0:
-		return None
-	else:
-		return solFiles[0]
+    solFiles = getPlanFileNames()
+    if len(solFiles) == 0:
+        return None
+    else:
+        return solFiles[0]
 
 
-def runPlanner(baseFolder, time, memory, problemFile, planFilePrefix):
+def runPlanner(baseFolder, time, memory, problemFile, planFilePrefix, iteratedSolution):
     removeExistingJSONPlans()
     print "Planning..."
     tmpPlanningFolder = os.path.realpath(baseFolder + "/../temporal-planning")
     domainFile = baseFolder + "/domains/domain.pddl"
-    tmpPlanningCmd = "%s/bin/plan.py -t %s -m %s --no-iterated --plan-file %s she %s %s" % (tmpPlanningFolder, time, memory, planFilePrefix, domainFile, problemFile)
+    iteratedFlag = None
+    if iteratedSolution:
+        iteratedFlag = "--iterated"
+    else:
+        iteratedFlag = "--no-iterated"
+    tmpPlanningCmd = "%s/bin/plan.py -t %s -m %s %s --plan-file %s she %s %s" % (tmpPlanningFolder, time, memory, iteratedFlag, planFilePrefix, domainFile, problemFile)
     os.system(tmpPlanningCmd)
 
 
 def runSelfishPlanner(baseFolder, time, memory, problemFile, planFilePrefix, problemFolder):
     os.chdir(problemFolder)
-    runPlanner(baseFolder, time, memory, problemFile, planFilePrefix)
+    runPlanner(baseFolder, time, memory, problemFile, planFilePrefix, False)
 
 
 def removeExistingJSONPlans():
@@ -85,15 +98,25 @@ def convertLastPlanToJSON(mapParser, configObj):
     elif solutionType == "selfish":
         lastPlanFile = "tmp_sas_plan"
     if lastPlanFile is not None:
-        print "Parsing plan %s..." % lastPlanFile
-        planParser = PlanToJSONConverter()
-        planParser.parse(lastPlanFile)
-        planFileName = "%s.json" % lastPlanFile
-        with open(planFileName, "w") as f:
-            print "Writing JSONed plan to %s" % planFileName
-            f.write(json.dumps(planParser.getJSON(mapParser)))
+        convertPlanToJSON(mapParser, configObj, lastPlanFile)
     else:
         print "Error: There was not any plan to JSONify"
+
+
+def convertAllPlansToJSON(mapParser, configObj):
+    solFiles = getPlanFileNames()
+    for planFile in solFiles:
+        convertPlanToJSON(mapParser, configObj, planFile)
+
+
+def convertPlanToJSON(mapParser, configObj, planFile):
+    print "Parsing plan %s..." % planFile
+    planParser = PlanToJSONConverter()
+    planParser.parse(planFile)
+    planFileName = "%s.json" % planFile
+    with open(planFileName, "w") as f:
+        print "Writing JSONed plan to %s" % planFileName
+        f.write(json.dumps(planParser.getJSON(mapParser)))
 
 
 def convertLastPlanToGeoJSON(mapParser, configObj):
@@ -196,11 +219,11 @@ def solveSelfishProblem(mapParser, configObj, baseFolder, argTime, argMemory):
     mergePartialPlans()
 
 
-def solveCooperativeProblem(mapParser, configObj, baseFolder, argTime, argMemory):
+def solveCooperativeProblem(mapParser, configObj, baseFolder, argTime, argMemory, argIteratedSolution):
     problemFileName = "output.pddl"
     planFilePrefix = "sas_plan"
     generatePDDLForProblem(mapParser, configObj, problemFileName)
-    runPlanner(baseFolder, argTime, argMemory, problemFileName, planFilePrefix)
+    runPlanner(baseFolder, argTime, argMemory, problemFileName, planFilePrefix, argIteratedSolution)
 
 
 app = Flask(__name__)
@@ -233,7 +256,7 @@ if __name__ == "__main__":
         if "solution_type" in configObj:
             solutionType = configObj["solution_type"]
         if (solutionType is None) or (solutionType == "cooperative"):
-            solveCooperativeProblem(mapParser, configObj, baseFolder, args.time, args.memory)
+            solveCooperativeProblem(mapParser, configObj, baseFolder, args.time, args.memory, args.iterated)
         elif solutionType == "selfish":
             solveSelfishProblem(mapParser, configObj, baseFolder, args.time, args.memory)
         else:
@@ -241,7 +264,7 @@ if __name__ == "__main__":
             exit(-1)
 
         if args.json:
-            convertLastPlanToJSON(mapParser, configObj)
+            convertAllPlansToJSON(mapParser, configObj)
         if args.visualize:
             geoJsonPlan = convertLastPlanToGeoJSON(mapParser, configObj)
             if geoJsonPlan is not None:
