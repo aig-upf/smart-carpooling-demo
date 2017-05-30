@@ -84,7 +84,7 @@ def getPedestrians(regionNodes, numPedestrians, carsInfomation):
 
         pedestrian = {"id": pedestrianId, "init_pos": randomOriginNode.getName(), "target_pos": randomDestNode.getName(), "walk_range": walkRange}
         if carsInfomation is not None:
-            pedestrian.update(carsInfomation.getRandomCar())
+            pedestrian.update(carsInfomation.getRandomCar({"fuel_type": ["Diesel"]}))
         pedestrians.append(pedestrian)
 
         pedestrianNodeIdsMap[pedestrianId] = {}
@@ -121,7 +121,7 @@ def getCarpools(regionNodes, numCarpools, pedestrianNodeIds, blockPedestrianLink
                     "init_pos": randomOriginNode.getName(),
                     "target_pos": randomDestNode.getName()}
         if carsInfomation is not None:
-            carpool.update(carsInfomation.getRandomCar())
+            carpool.update(carsInfomation.getRandomCar({"fuel_type": ["Diesel"]}))
         carpools.append(carpool)
 
     return carpools

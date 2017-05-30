@@ -31,8 +31,24 @@ class CarDataManager:
 
         print "Parsing completed!"
 
-    def getRandomCar(self):
-        numCars = len(self.cars)
+    def __getFilteredCars(self, filters):
+        if filters is None:
+            return self.cars
+        filteredCars = []
+        for car in self.cars:
+            filterCar = True
+            for filterAttr in filters:
+                filterValArray = filters[filterAttr]
+                if car[filterAttr] not in filterValArray:
+                    filterCar = False
+                    break
+            if filterCar:
+                filteredCars.append(car)
+        return filteredCars
+
+    def getRandomCar(self, filters):
+        filteredCars = self.__getFilteredCars(filters)
+        numCars = len(filteredCars)
         if numCars > 0:
-            return self.cars[randint(0, numCars - 1)]
+            return filteredCars[randint(0, numCars - 1)]
         return None
