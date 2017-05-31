@@ -1,5 +1,5 @@
 (function(){
-	var mapboxAccessToken = "pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw";
+	var mapboxAccessToken = "pk.eyJ1IjoiZGFuaWVsZmIiLCJhIjoiY2ozZDR6eGU0MDA0ZzJxbnIyZzJ0YW1hcyJ9.7y9x4L3QsGkdls_1Qb5HKg";
 	var agentColours = {};
 	var myMap = null;
 	var geoJsonData = null;
