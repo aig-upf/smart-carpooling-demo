@@ -3,6 +3,7 @@
 import argparse
 import json
 from osmutils import *
+from carutils import *
 from random import randint
 try:
     from queue import Queue
@@ -22,6 +23,7 @@ def getArguments():
     argParser.add_argument("minwalk", type=int, help="minimum walk range for a pedestrian")
     argParser.add_argument("maxwalk", type=int, help="maximum walk range for a pedestrian")
     argParser.add_argument("--block-pedestrian-links", action="store_true", default=False, help="whether to block links inside pedestrian walk range")
+    argParser.add_argument("--carinfo", default=None, help="path to the file containing information about diverse cars")
     return argParser.parse_args()
 
 
@@ -69,7 +71,7 @@ def getLinksInWalkRange(currentNode, linksList, remainingDistance, visitedNodeId
                     getLinksInWalkRange(link.getLinkedNode(), linksList, newRemainingDistance, visitedNodeIds)
 
 
-def getPedestrians(regionNodes, numPedestrians):
+def getPedestrians(regionNodes, numPedestrians, carsInfomation):
     pedestrians = []
     pedestrianLinks = []
     pedestrianNodeIds = set()
@@ -80,7 +82,10 @@ def getPedestrians(regionNodes, numPedestrians):
         randomDestNode = regionNodes[randint(0, len(regionNodes) - 1)]
         walkRange = randint(args.minwalk, args.maxwalk)
 
-        pedestrians.append({"id": pedestrianId, "init_pos": randomOriginNode.getName(), "target_pos": randomDestNode.getName(), "walk_range": walkRange})
+        pedestrian = {"id": pedestrianId, "init_pos": randomOriginNode.getName(), "target_pos": randomDestNode.getName(), "walk_range": walkRange}
+        if carsInfomation is not None:
+            pedestrian.update(carsInfomation.getRandomCar({"fuel_type": ["Diesel"]}))
+        pedestrians.append(pedestrian)
 
         pedestrianNodeIdsMap[pedestrianId] = {}
 
@@ -100,7 +105,7 @@ def getPedestrians(regionNodes, numPedestrians):
     return pedestrians, pedestrianLinks, pedestrianNodeIds, pedestrianNodeIdsMap
 
 
-def getCarpools(regionNodes, numCarpools, pedestrianNodeIds, blockPedestrianLinks):
+def getCarpools(regionNodes, numCarpools, pedestrianNodeIds, blockPedestrianLinks, carsInfomation):
     carpools = []
     carpoolNodes = [node for node in regionNodes if node.getId() not in pedestrianNodeIds]
 
@@ -112,18 +117,15 @@ def getCarpools(regionNodes, numCarpools, pedestrianNodeIds, blockPedestrianLink
                 (blockPedestrianLinks and not areNodesConnected(randomOriginNode, randomDestNode, pedestrianNodeIds)):
             randomOriginNode = carpoolNodes[randint(0, len(carpoolNodes) - 1)]
             randomDestNode = carpoolNodes[randint(0, len(carpoolNodes) - 1)]
-        carpools.append({
-                            "id": carpoolId,
-                            "init_pos": randomOriginNode.getName(),
-                            "target_pos": randomDestNode.getName(),
-                            "age": ageValues[randint(0, len(ageValues) - 1)],
-                            "fuel": fuelValues[randint(0, len(fuelValues) - 1)]
-                        })
+        carpool = { "id": carpoolId,
+                    "init_pos": randomOriginNode.getName(),
+                    "target_pos": randomDestNode.getName()}
+        if carsInfomation is not None:
+            carpool.update(carsInfomation.getRandomCar({"fuel_type": ["Diesel"]}))
+        carpools.append(carpool)
 
     return carpools
 
-ageValues = ["0-1", "1-2", "3-5", "5-10", ">10"]
-fuelValues = ["PETROL", "HYBRID", "DIESEL", "LPG"]
 
 if __name__ == "__main__":
     args = getArguments()
@@ -131,10 +133,15 @@ if __name__ == "__main__":
     mapParser = OpenStreeMapParser()
     mapParser.parse(args.map)
 
+    carsInfomation = None
+    if args.carinfo is not None:
+        carsInfomation = CarDataManager()
+        carsInfomation.parseCarDataFile(args.carinfo)
+
     regionNodes = mapParser.getNodesForRegion(args.minlat, args.maxlat, args.minlon, args.maxlon)
 
-    pedestrians, pedestrianLinks, pedestrianNodeIds, pedestrianNodeIdsMap = getPedestrians(regionNodes, args.pedestrians)
-    carpools = getCarpools(regionNodes, args.carpools, pedestrianNodeIds, args.block_pedestrian_links)
+    pedestrians, pedestrianLinks, pedestrianNodeIds, pedestrianNodeIdsMap = getPedestrians(regionNodes, args.pedestrians, carsInfomation)
+    carpools = getCarpools(regionNodes, args.carpools, pedestrianNodeIds, args.block_pedestrian_links, carsInfomation)
 
     finalObj = {"carpools": carpools, "pedestrians": pedestrians, "blocked_streets": []}
     if args.block_pedestrian_links:
