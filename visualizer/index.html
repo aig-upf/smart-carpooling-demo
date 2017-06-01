@@ -45,27 +45,38 @@
             </button>
           </div>
         </div>
+        <br>
+        <span class="label label-default center-block">Plan Management</span>
+        <button id="send-current-state-button" class="btn btn-default btn-group-justified" type="button">
+          <span class="glyphicon glyphicon-send"></span><span> </span>Send current state
+        </button>
       </div>
       <div class="col-sm-6">
         <span class="label label-default center-block">Map Edition</span>
-        <div>
-          <button id="toggle-block-random-link-button" type="button">Toggle block random link</button>
-          <input id="num-block-random-link" type="number" value="0">
+        <div class="input-group">
+          <span class="input-group-addon">Toggle block</span>
+          <input id="num-block-random-link" type="number" class="form-control" value="0">
+          <span class="input-group-addon">random link(s)</span>
+          <span class="input-group-btn">
+            <button id="toggle-block-random-link-button" class="btn btn-default" type="button">Apply</button>
+          </span>
         </div>
-        <div>
-          <button id="toggle-block-planned-link-button" type="button">Toggle block planned link</button>
-          <input id="num-block-planned-link" type="number" value="0">
+        <div class="input-group">
+          <span class="input-group-addon">Toggle block</span>
+          <input id="num-block-planned-link" type="number" class="form-control" value="0">
+          <span class="input-group-addon">planned link(s)</span>
+          <span class="input-group-btn">
+            <button id="toggle-block-planned-link-button" class="btn btn-default" type="button">Apply</button>
+          </span>
         </div>
-        <div>
-          <input id="toggle-block-link-on-step" type="checkbox" name="toggle-block-link-on-step">
-          <label for="toggle-block-link-on-step">Toggle block planned link on step with probability</label>
-          <input id="toggling-probability" type="number" min="0" max="100" step="1" value="0">
-          <span>%</span>
+        <div class="input-group">
+          <span class="input-group-addon">
+            <input id="toggle-block-link-on-step" type="checkbox" aria-label="...">
+          </span>
+          <span class="input-group-addon">Toggle block planned link on step with probability</span>
+          <input id="toggling-probability" type="number" min="0" max="100" step="1" value="0" class="form-control">
+          <span class="input-group-addon">%</span>
         </div>
       </div>
-    <br>
-    <div>
-      <button id="send-current-state-button" type="button">Send current state</button>
-    </div>
   </body>
 </html>
