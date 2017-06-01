@@ -3,6 +3,11 @@
 	padding: 5px;
 }
 
+#map-editor {
+	width: 75%;
+	margin-left: 5px;
+}
+
 #mapid {
 	width: 75%;
 	height: 450px;

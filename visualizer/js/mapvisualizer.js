@@ -26,7 +26,7 @@
 
 	var currentAdaptationId = 1;
 
-	var shutdownProviderOnPlanReception = true;
+	var shutdownProviderOnPlanReception = false;
 
 	readPlanInterval = setInterval(readPlan, readPlanIntervalDuration);
 
@@ -101,7 +101,8 @@
 	function stopPlayInterval(){
 		clearInterval(playInterval);
 		playInterval = null;
-		$("#play-timestamp-button").text("Play");
+		$("#play-timestamp-button .glyphicon").removeClass("glyphicon-pause").addClass("glyphicon-play");
+		$("#play-timestamp-button .nav-btn-text").text("Play");
 	}
 
 	function setAgentColourPairs(geoJsonMap){
@@ -479,7 +480,8 @@
 	$(document).on("click", "#play-timestamp-button", function(){
 		if (playInterval == null) {
 			playInterval = setInterval(showNextMap, playIntervalDuration);
-			$("#play-timestamp-button").text("Pause");
+			$("#play-timestamp-button .glyphicon").removeClass("glyphicon-play").addClass("glyphicon-pause");
+			$("#play-timestamp-button .nav-btn-text").text("Pause");
 		}
 		else {
 			stopPlayInterval();
