@@ -34,12 +34,13 @@ The installation of the following Python libraries is required to execute the to
 * [Flask](http://flask.pocoo.org/docs/0.12/quickstart/)
 * [Flask-CORS](https://flask-cors.readthedocs.io/en/latest/)
 * [geopy](https://pypi.python.org/pypi/geopy)
+* [openpyxl](http://openpyxl.readthedocs.io/en/default/)
 * [parse](https://pypi.python.org/pypi/parse)
 * [queuelib](https://pypi.python.org/pypi/queuelib)
 
 You can install all of them at once using the following command:
 ```
-pip install flask flask-cors geopy parse queuelib
+pip install flask flask-cors geopy openpyxl parse queuelib
 ```
 
 ## <a name="usage"></a>Usage
@@ -49,7 +50,7 @@ To test if everything has been correctly installed, you can follow this section.
 
 ```
 parser.py [-h] [--plan] [--json] [--visualize] [--time TIME] [--memory MEMORY] config
-``` 
+```
 
 where:
 
@@ -117,7 +118,7 @@ Mobility problems are specified using the JSON format. These problems are later 
 * `carpools` - list of carpools in the problem. Each contains the following fields:
 	* `id` - a unique identifier.
 	* `init_pos` - OSM label of its initial position.
-	* `target_pos` - OSM label of its target position. 
+	* `target_pos` - OSM label of its target position.
 * `blocked_streets` - list of blocked streets in the problem. Each contains the following fields:
 	* `init_pos` - OSM label of its initial position.
 	* `target_pos` - OSM label of its target position.
