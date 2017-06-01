@@ -31,7 +31,7 @@
 
 	var planUrl = 5000;
 
-	var shutdownProviderOnPlanReception = false;
+	var shutdownProviderOnPlanReception = true;
 
 	function readPlan(){
 		$.getJSON(planUrl, function(json){

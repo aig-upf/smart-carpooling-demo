@@ -165,8 +165,8 @@ def parseMapFile(mapParser, mapPath, configFilePath):
         mapParser.parse(mapAbsPath)
 
 
-def openMapVisualizer(baseFolder):
-    visualizePage = "file://" + os.path.realpath(baseFolder + "/visualizer/index.html")
+def openMapVisualizer(baseFolder, visualizerPort):
+    visualizePage = "file://" + os.path.realpath(baseFolder + "/visualizer/index.html?port=" + str(visualizerPort))
     webbrowser.open_new_tab(visualizePage)
 
 
@@ -268,8 +268,11 @@ if __name__ == "__main__":
         if args.visualize:
             geoJsonPlan = convertLastPlanToGeoJSON(mapParser, configObj)
             if geoJsonPlan is not None:
-                # openMapVisualizer(baseFolder)
-                app.run()
+                visualizerPort = 5000
+                if solutionType == "selfish":
+                    visualizerPort = 5001
+                openMapVisualizer(baseFolder, visualizerPort)
+                app.run(port=visualizerPort)
 
 '''
     (46.0643, 46.0715, 11.1164, 11.1272) # 1125 nodes
