@@ -166,9 +166,11 @@ def parseMapFile(mapParser, mapPath, configFilePath):
 
 
 def openMapVisualizer(baseFolder, visualizerPort):
-    visualizePage = "file://" + os.path.realpath(baseFolder + "/visualizer/index.html?port=" + str(visualizerPort))
-    webbrowser.open_new_tab(visualizePage)
-
+    visualizePage = "file://" + os.path.realpath(baseFolder + "/visualizer/index.html") + "?port=" + str(visualizerPort)
+    try:
+        webbrowser.get("google-chrome").open_new_tab(visualizePage)
+    except:
+        webbrowser.open_new_tab(visualizePage)
 
 def getProcessForConfigObj(configObj, mapParser, baseFolder, partId, argTime, argMemory):
     problemFolder = "part_%s" % partId
@@ -271,7 +273,7 @@ if __name__ == "__main__":
                 visualizerPort = 5000
                 if solutionType == "selfish":
                     visualizerPort = 5001
-                openMapVisualizer(baseFolder, visualizerPort)
+                # openMapVisualizer(baseFolder, visualizerPort)
                 app.run(port=visualizerPort)
 
 '''
