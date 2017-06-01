@@ -26,6 +26,9 @@
 
 	var currentAdaptationId = 1;
 
+	var lastZoomLevel = null;
+	var lastZoomCenter = null;
+
 	var shutdownProviderOnPlanReception = false;
 
 	readPlanInterval = setInterval(readPlan, readPlanIntervalDuration);
@@ -239,10 +242,17 @@
 		}
 
 		setAgentColourPairs(geoJsonMap);
-		var avgCoords = getAverageCoordinates(geoJsonMap);
-		myMap = L.map('mapid').setView([avgCoords[0], avgCoords[1]], 15);
+
+		if (lastZoomLevel == null || lastZoomCenter == null) {
+			var avgCoords = getAverageCoordinates(geoJsonMap);
+			myMap = L.map("mapid").setView([avgCoords[0], avgCoords[1]], 15);
+		}
+		else {
+			myMap = L.map(mapid).setView(lastZoomCenter, lastZoomLevel);
+		}
+
 		L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=' + mapboxAccessToken, {
-									maxZoom: 30,
+									maxZoom: 25,
 									attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
 															 '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
 															 'Imagery © <a href="http://mapbox.com">Mapbox</a>',
@@ -251,6 +261,12 @@
 		L.MakiMarkers.accessToken = mapboxAccessToken;
 		L.MakiMarkers.smallOptions.iconSize = [15, 40];
 		addLegendToMap(myMap);
+		myMap.on("zoomend, moveend", onMapPositionChanged);
+	}
+
+	function onMapPositionChanged() {
+		lastZoomLevel = myMap.getZoom();
+		lastZoomCenter = myMap.getCenter();
 	}
 
 	function addStyle(feature) {
