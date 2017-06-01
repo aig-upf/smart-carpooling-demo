@@ -29,12 +29,12 @@
 	var lastZoomLevel = null;
 	var lastZoomCenter = null;
 
+	var planUrl = 5000;
+
 	var shutdownProviderOnPlanReception = false;
 
-	readPlanInterval = setInterval(readPlan, readPlanIntervalDuration);
-
 	function readPlan(){
-		$.getJSON("http://localhost:5000/", function(json){
+		$.getJSON(planUrl, function(json){
 			if (lastTimestamp != json["timestamp"]){
 				resetVariables();
 				geoJsonData = json["geojson"];
@@ -54,7 +54,7 @@
 	}
 
 	function shutdownPlanProvider(){
-		$.post("http://localhost:5000/shutdown");
+		$.post(planUrl + "/shutdown");
 	}
 
 	function resetVariables(){
@@ -482,6 +482,25 @@
 			showMap(geoJsonData);
 		}
 	}
+
+	function getPlanPortListenerFromUrl(){
+		var urlParams = window.location.search.substr(1);
+		var urlParamsSplit = urlParams.split("&");
+		for (var i = 0; i < urlParamsSplit.length; ++i) {
+			var keyValue = urlParamsSplit[i].split("=");
+			if (keyValue.length == 2) {
+				if (keyValue[0] == "port") {
+					return parseInt(keyValue[1]);
+				}
+			}
+		}
+		return 5000;
+	}
+
+	$(document).ready(function(){
+		planUrl = "http://localhost:" + getPlanPortListenerFromUrl();
+		readPlanInterval = setInterval(readPlan, readPlanIntervalDuration);
+	});
 
 	$(document).on("click", "#back-timestamp-button", function(){
 		stopPlayInterval();
