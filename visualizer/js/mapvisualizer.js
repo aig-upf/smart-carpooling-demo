@@ -1,5 +1,8 @@
 (function(){
 	var mapboxAccessToken = "pk.eyJ1IjoiZGFuaWVsZmIiLCJhIjoiY2ozZDR6eGU0MDA0ZzJxbnIyZzJ0YW1hcyJ9.7y9x4L3QsGkdls_1Qb5HKg";
+
+	var agentNames = [];
+
 	var agentColours = {};
 	var myMap = null;
 	var geoJsonData = null;
@@ -29,21 +32,22 @@
 	var lastZoomLevel = null;
 	var lastZoomCenter = null;
 
-	var planUrl = 5000;
+	var planUrl = "";
 
-	var shutdownProviderOnPlanReception = true;
+	var shutdownProviderOnPlanReception = false;
 
 	function readPlan(){
 		$.getJSON(planUrl, function(json){
 			if (lastTimestamp != json["timestamp"]){
 				resetVariables();
 				geoJsonData = json["geojson"];
-				getStreetsFromGeoJSON(geoJsonData);
-				getTimestampsFromGeoJSON(geoJsonData);
-				getInitialPositionsFromGeoJSON(geoJsonData);
-				getOsmLabelCoordinatesCorrespondences(geoJsonData);
-				getAgentTimestampsFromGeoJSON(geoJsonData);
-				showMap(geoJsonData);
+				getStreetsFromGeoJSON();
+				getTimestampsFromGeoJSON();
+				getInitialPositionsFromGeoJSON();
+				getOsmLabelCoordinatesCorrespondences();
+				getAgentTimestampsFromGeoJSON();
+				showMap();
+				showUpdatedDistances();
 				lastTimestamp = json["timestamp"];
 
 				if (shutdownProviderOnPlanReception) {
@@ -58,6 +62,7 @@
 	}
 
 	function resetVariables(){
+		agentNames = [];
 		agentColours = {};
 		initialLocations = {};
 		agentLocations = {};
@@ -75,13 +80,16 @@
 	function showPreviousMap(){
 		if (currentTimestampIndex > 0) {
 			currentTimestampIndex -= 1;
-			showMap(geoJsonData);
+			showMap();
 		}
 	}
 
 	function showNextMap(){
 		if (currentTimestampIndex < timestampSteps.length - 1) {
 			currentTimestampIndex += 1;
+
+			showUpdatedDistances();
+
 			if ($("#toggle-block-link-on-step").is(":checked")) {
 				var randomInt = getRandomInt(0, 100);
 				var selectedProbability = parseInt($("#toggling-probability").val());
@@ -89,11 +97,11 @@
 					toggleBlockRandomPlannedLinks(1);
 				}
 				else {
-					showMap(geoJsonData);
+					showMap();
 				}
 			}
 			else {
-				showMap(geoJsonData);
+				showMap();
 			}
 		}
 		else {
@@ -108,15 +116,46 @@
 		$("#play-timestamp-button .nav-btn-text").text("Play");
 	}
 
-	function setAgentColourPairs(geoJsonMap){
-		for (var i = 0; i < geoJsonMap.length; ++i){
-			var agentId = geoJsonMap[i].properties.agent_id;
+	function showUpdatedDistances(){
+		var currentTimestamp = timestampSteps[currentTimestampIndex];
+		var agentDistances = {};
+
+		for (var i = 0; i < agentNames.length; ++i) {
+			agentDistances[agentNames[i]] = 0.0;
+		}
+
+		for (var i = 0; i < geoJsonData.length; ++i) {
+			if (geoJsonData[i].properties.timestamp <= currentTimestamp && geoJsonData[i].geometry.type == "LineString") {
+				var agentId = geoJsonData[i].properties.agent_id;
+				agentDistances[agentId] += geoJsonData[i].properties.distance;
+			}
+		}
+
+		var distanceText = "";
+		for (var agent in agentDistances) {
+			distanceText += agent + ": " + agentDistances[agent] + "\n";
+		}
+		$("#agent-distances").text(distanceText);
+	}
+
+	function setAgentNames(){
+		for (var i = 0; i < geoJsonData.length; ++i){
+			var agentId = geoJsonData[i].properties.agent_id;
+			if (agentId != null && agentNames.indexOf(agentId) < 0){
+				agentNames.push(agentId);
+			}
+		}
+	}
+
+	function setAgentColourPairs(){
+		for (var i = 0; i < agentNames.length; ++i){
+			var agentId = agentNames[i];
 			if (agentId != null && agentColours[agentId] == null)
 				agentColours[agentId] = randomColor();
 		}
 	}
 
-	function getStreetsFromGeoJSON(geoJsonData){
+	function getStreetsFromGeoJSON(){
 		for (var i = 0; i < geoJsonData.length; ++i) {
 			if (geoJsonData[i].properties.original_link) {
 				var startLabel = geoJsonData[i].properties.start_label;
@@ -145,7 +184,7 @@
 		}
 	}
 
-	function getTimestampsFromGeoJSON(geoJsonData){
+	function getTimestampsFromGeoJSON(){
 		for (var i = 0; i < geoJsonData.length; ++i){
 			var ts = geoJsonData[i].properties.timestamp;
 			if (ts != null && timestampSteps.indexOf(ts) < 0){
@@ -157,7 +196,7 @@
 		});
 	}
 
-	function getInitialPositionsFromGeoJSON(geoJsonData){
+	function getInitialPositionsFromGeoJSON(){
 		for (var i = 0; i < geoJsonData.length; ++i){
 			var isInit = geoJsonData[i].properties.init_node;
 			if (isInit){
@@ -169,7 +208,7 @@
 		agentLocations = JSON.parse(JSON.stringify(initialLocations));
 	}
 
-	function getOsmLabelCoordinatesCorrespondences(geoJsonData){
+	function getOsmLabelCoordinatesCorrespondences(){
 		for (var i = 0; i < geoJsonData.length; ++i){
 			if (geoJsonData[i].geometry.type == "Point") {
 				var label = geoJsonData[i].properties.node_label;
@@ -179,7 +218,7 @@
 		}
 	}
 
-	function getAgentTimestampsFromGeoJSON(geoJsonData){
+	function getAgentTimestampsFromGeoJSON(){
 		for (var i = 0; i < geoJsonData.length; ++i){
 			if (geoJsonData[i].geometry.type == "Point") {
 				var agent = geoJsonData[i].properties.agent_id;
@@ -199,11 +238,11 @@
 		}
 	}
 
-	function getAverageCoordinates(geoJsonMap){
+	function getAverageCoordinates(){
 		var latSum = 0, lonSum = 0;
 		var accountedItems = 0;
-		for (var i = 0; i < geoJsonMap.length; ++i){
-			var geometryItem = geoJsonMap[i].geometry;
+		for (var i = 0; i < geoJsonData.length; ++i){
+			var geometryItem = geoJsonData[i].geometry;
 			if (geometryItem != null && geometryItem.type == "Point" && geometryItem.coordinates != null) {
 				latSum += geometryItem.coordinates[1];
 				lonSum += geometryItem.coordinates[0];
@@ -235,16 +274,17 @@
 		legend.addTo(myMap);
 	}
 
-	function createMap(geoJsonMap) {
+	function createMap() {
 		if (myMap != null) {
 			myMap.off();
 			myMap.remove();
 		}
 
-		setAgentColourPairs(geoJsonMap);
+		setAgentNames();
+		setAgentColourPairs();
 
 		if (lastZoomLevel == null || lastZoomCenter == null) {
-			var avgCoords = getAverageCoordinates(geoJsonMap);
+			var avgCoords = getAverageCoordinates(geoJsonData);
 			myMap = L.map("mapid").setView([avgCoords[0], avgCoords[1]], 15);
 		}
 		else {
@@ -327,7 +367,7 @@
 			click: function(){
 				if (feature.properties.original_link) {
 					toggleBlockLink(feature.properties.start_label, feature.properties.end_label, feature.geometry.coordinates);
-					showMap(geoJsonData);
+					showMap();
 				}
 			}
 		});
@@ -428,10 +468,10 @@
 		return dist
 	}
 
-	function showMap(geoJsonMap) {
+	function showMap() {
 		$("#maplogs").text("Current Timestamp: " + timestampSteps[currentTimestampIndex]);
-		createMap(geoJsonMap);
-		L.geoJSON(geoJsonMap, {
+		createMap();
+		L.geoJSON(geoJsonData, {
 				style: addStyle,
 				pointToLayer: pointToLayer,
 				onEachFeature: onEachFeature,
@@ -468,7 +508,7 @@
 		}
 
 		if (numBlocked > 0) {
-			showMap(geoJsonData);
+			showMap();
 		}
 	}
 
@@ -479,7 +519,7 @@
 		}
 
 		if (numBlocked > 0) {
-			showMap(geoJsonData);
+			showMap();
 		}
 	}
 
@@ -527,7 +567,8 @@
 		stopPlayInterval();
 		currentTimestampIndex = 0;
 		agentLocations = JSON.parse(JSON.stringify(initialLocations));
-		showMap(geoJsonData);
+		showMap();
+		showUpdatedDistances();
 	});
 
 	$(document).on("click", "#send-current-state-button", function(){

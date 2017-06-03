@@ -169,15 +169,17 @@ class PlanToGeoJSONConverter(PlanParser):
                 originNode = mapParser.getNodeForId(int(mov["origin"][3:]))
                 destNode = mapParser.getNodeForId(int(mov["destination"][3:]))
                 coordinates = []
+                selectedLink = None
 
                 for link in originNode.getLinks():
                     if link.getOriginNode() == originNode and link.getLinkedNode() == destNode:
+                        selectedLink = link
                         for subNode in link.getGeometry():
                             coordinates.append([subNode.getLongitude(), subNode.getLatitude()])
                         break
                 if len(coordinates) > 0:
                     movTimestamp = mov["timestamp"] + mov["duration"]
-                    featureVector.append(self.__getLineFeatureForAgentAndCoordinates(agentId, coordinates, movTimestamp, originNode.getName(), destNode.getName()))
+                    featureVector.append(self.__getLineFeatureForAgentAndCoordinates(agentId, coordinates, movTimestamp, originNode.getName(), destNode.getName(), selectedLink.getDistanceToLinkedNode()))
                     eventContent = ""
                     if mov["action"] == "travel":
                         eventContent = "Vehicle %s travels (%s)" % (agentId, movTimestamp)
@@ -224,9 +226,9 @@ class PlanToGeoJSONConverter(PlanParser):
                 blockedLinks.append((blockedLink["init_pos"], blockedLink["target_pos"]))
         return blockedLinks
 
-    def __getLineFeatureForAgentAndCoordinates(self, agentId, coordinates, timestamp, startLabel, endLabel):
+    def __getLineFeatureForAgentAndCoordinates(self, agentId, coordinates, timestamp, startLabel, endLabel, distance):
         return {"type": "Feature",
-                "properties": {"agent_id": agentId.lower(), "timestamp": timestamp, "link_in_plan": True, "start_label": startLabel, "end_label": endLabel},
+                "properties": {"agent_id": agentId.lower(), "timestamp": timestamp, "link_in_plan": True, "start_label": startLabel, "end_label": endLabel, "distance": distance},
                 "geometry": {
                     "type": "LineString",
                     "coordinates": coordinates
