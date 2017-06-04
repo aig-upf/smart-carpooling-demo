@@ -2,6 +2,7 @@
 	var mapboxAccessToken = "pk.eyJ1IjoiZGFuaWVsZmIiLCJhIjoiY2ozZDR6eGU0MDA0ZzJxbnIyZzJ0YW1hcyJ9.7y9x4L3QsGkdls_1Qb5HKg";
 
 	var agentNames = [];
+	var agentTypes = {};
 
 	var agentColours = {};
 	var myMap = null;
@@ -63,6 +64,7 @@
 
 	function resetVariables(){
 		agentNames = [];
+		agentTypes = [];
 		agentColours = {};
 		initialLocations = {};
 		agentLocations = {};
@@ -131,18 +133,38 @@
 			}
 		}
 
+		var agentTypeDistances = {};
+
+		for (var agentType in agentTypes) {
+			var agentSum = 0;
+			var agentList = agentTypes[agentType];
+			for (var i = 0; i < agentList.length; ++i) {
+				agentSum += agentDistances[agentList[i]];
+			}
+			agentTypeDistances[agentType] = agentSum;
+		}
+
 		var distanceText = "";
 		for (var agent in agentDistances) {
 			distanceText += agent + ": " + agentDistances[agent] + "\n";
 		}
+		distanceText += "\n";
+		for (var agentType in agentTypeDistances) {
+			distanceText += agentType + ": " + agentTypeDistances[agentType] + "\n";
+		}
 		$("#agent-distances").text(distanceText);
 	}
 
-	function setAgentNames(){
+	function setAgentNamesAndTypes(){
 		for (var i = 0; i < geoJsonData.length; ++i){
+			var agentType = geoJsonData[i].properties.agent_type;
+			if (agentType != null && agentTypes[agentType] == null){
+				agentTypes[agentType] = [];
+			}
 			var agentId = geoJsonData[i].properties.agent_id;
 			if (agentId != null && agentNames.indexOf(agentId) < 0){
 				agentNames.push(agentId);
+				agentTypes[agentType].push(agentId);
 			}
 		}
 	}
@@ -280,7 +302,7 @@
 			myMap.remove();
 		}
 
-		setAgentNames();
+		setAgentNamesAndTypes();
 		setAgentColourPairs();
 
 		if (lastZoomLevel == null || lastZoomCenter == null) {
@@ -288,7 +310,7 @@
 			myMap = L.map("mapid").setView([avgCoords[0], avgCoords[1]], 15);
 		}
 		else {
-			myMap = L.map(mapid).setView(lastZoomCenter, lastZoomLevel);
+			myMap = L.map("mapid").setView(lastZoomCenter, lastZoomLevel);
 		}
 
 		L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=' + mapboxAccessToken, {

@@ -179,7 +179,7 @@ class PlanToGeoJSONConverter(PlanParser):
                         break
                 if len(coordinates) > 0:
                     movTimestamp = mov["timestamp"] + mov["duration"]
-                    featureVector.append(self.__getLineFeatureForAgentAndCoordinates(agentId, coordinates, movTimestamp, originNode.getName(), destNode.getName(), selectedLink.getDistanceToLinkedNode()))
+                    featureVector.append(self.__getLineFeatureForAgentAndCoordinates(agentId, coordinates, movTimestamp, originNode.getName(), destNode.getName(), selectedLink.getDistanceToLinkedNode(), mov["agent_type"]))
                     eventContent = ""
                     if mov["action"] == "travel":
                         eventContent = "Vehicle %s travels (%s)" % (agentId, movTimestamp)
@@ -226,9 +226,17 @@ class PlanToGeoJSONConverter(PlanParser):
                 blockedLinks.append((blockedLink["init_pos"], blockedLink["target_pos"]))
         return blockedLinks
 
-    def __getLineFeatureForAgentAndCoordinates(self, agentId, coordinates, timestamp, startLabel, endLabel, distance):
+    def __getLineFeatureForAgentAndCoordinates(self, agentId, coordinates, timestamp, startLabel, endLabel, distance, agentType):
         return {"type": "Feature",
-                "properties": {"agent_id": agentId.lower(), "timestamp": timestamp, "link_in_plan": True, "start_label": startLabel, "end_label": endLabel, "distance": distance},
+                "properties": {
+                    "agent_id": agentId.lower(),
+                    "timestamp": timestamp,
+                    "link_in_plan": True,
+                    "start_label": startLabel,
+                    "end_label": endLabel,
+                    "distance": distance,
+                    "agent_type": agentType
+                },
                 "geometry": {
                     "type": "LineString",
                     "coordinates": coordinates
