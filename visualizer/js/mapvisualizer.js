@@ -366,12 +366,12 @@
 	function onEachFeature(feature, layer) {
 		if (feature.properties.timestamp == timestampSteps[currentTimestampIndex] && feature.geometry.type == "Point") {
 				var eventContent = feature.properties.event_content;
-				if (eventContent != null && eventContent.length > 0) {
-					var popup = L.popup();
-					popup.setLatLng([feature.geometry.coordinates[1], feature.geometry.coordinates[0]]);
-					popup.setContent(feature.properties.event_content);
-					popup.addTo(myMap);
-				}
+//				if (eventContent != null && eventContent.length > 0) {
+//					var popup = L.popup();
+//					popup.setLatLng([feature.geometry.coordinates[1], feature.geometry.coordinates[0]]);
+//					popup.setContent(feature.properties.event_content);
+//					popup.addTo(myMap);
+//				}
 
 				if (feature.properties.agent_id != null) {
 					agentLocations[feature.properties.agent_id] = feature.properties.node_label;
