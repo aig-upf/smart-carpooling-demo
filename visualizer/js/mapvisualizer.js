@@ -33,6 +33,8 @@
 	var lastZoomLevel = null;
 	var lastZoomCenter = null;
 
+	var distanceChart = null;
+
 	var planUrl = "";
 
 	var shutdownProviderOnPlanReception = true;
@@ -42,11 +44,14 @@
 			if (lastTimestamp != json["timestamp"]){
 				resetVariables();
 				geoJsonData = json["geojson"];
+				setAgentNamesAndTypes();
+				setAgentColourPairs();
 				getStreetsFromGeoJSON();
 				getTimestampsFromGeoJSON();
 				getInitialPositionsFromGeoJSON();
 				getOsmLabelCoordinatesCorrespondences();
 				getAgentTimestampsFromGeoJSON();
+				createDistanceChart();
 				showMap();
 				showUpdatedDistances();
 				lastTimestamp = json["timestamp"];
@@ -60,6 +65,38 @@
 
 	function shutdownPlanProvider(){
 		$.post(planUrl + "/shutdown");
+	}
+
+	function createDistanceChart(){
+		var chartData = [], chartColours = [];
+
+		for (var i = 0; i < agentNames.length; ++i){
+			chartData.push(0);
+			chartColours.push(agentColours[agentNames[i]]);
+		}
+
+		distanceChart = new Chart($("#distance-chart"), {
+			type: 'bar',
+			data: {
+				labels: agentNames,
+				datasets: [{
+					data: chartData,
+					backgroundColor: chartColours
+				}]
+			},
+			options: {
+				legend: {
+					display: false
+				},
+				scales: {
+					yAxes: [{
+						ticks: {
+							beginAtZero:true
+						}
+					}]
+				}
+			}
+		});
 	}
 
 	function resetVariables(){
@@ -145,14 +182,16 @@
 		}
 
 		var distanceText = "";
-		for (var agent in agentDistances) {
-			distanceText += agent + ": " + agentDistances[agent] + " m\n";
-		}
-		distanceText += "\n";
 		for (var agentType in agentTypeDistances) {
 			distanceText += agentType + ": " + agentTypeDistances[agentType] + " m\n";
 		}
-		$("#agent-distances").text(distanceText);
+		$("#agent-distances").text(distanceText.trim());
+
+		distanceChart.data.datasets[0].data = [];
+		for (var i = 0; i < agentNames.length; ++i){
+			distanceChart.data.datasets[0].data.push(agentDistances[agentNames[i]]);
+		}
+		distanceChart.update();
 	}
 
 	function setAgentNamesAndTypes(){
@@ -301,9 +340,6 @@
 			myMap.off();
 			myMap.remove();
 		}
-
-		setAgentNamesAndTypes();
-		setAgentColourPairs();
 
 		if (lastZoomLevel == null || lastZoomCenter == null) {
 			var avgCoords = getAverageCoordinates(geoJsonData);

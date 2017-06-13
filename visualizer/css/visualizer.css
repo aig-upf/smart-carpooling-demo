@@ -10,15 +10,20 @@
 
 #mapid {
 	width: 100%;
-	height: 450px;
-	max-height: 450px;
+	height: 500px;
+	max-height: 500px;
 }
 
-#maplogs, #agent-distances {
-	height: 190px;
-	max-height: 190px;
-	width: 90%;
-	max-width: 90%;
+#maplogs {
+	height: 104px;
+	max-height: 104px;
+	width: 100%;
+	max-width: 100%;
+}
+
+#agent-distances, #agent-distances-selfish {
+	height: 56px;
+	max-height: 56px;
 }
 
 .legend-item {
@@ -33,4 +38,8 @@
 
 #num-block-random-link, #num-block-planned-link, #toggling-probability {
 	text-align: right;
+}
+
+#distance-chart, #distance-chart-selfish {
+	width: 100%;
 }
