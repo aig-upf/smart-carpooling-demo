@@ -146,11 +146,11 @@
 
 		var distanceText = "";
 		for (var agent in agentDistances) {
-			distanceText += agent + ": " + agentDistances[agent] + "\n";
+			distanceText += agent + ": " + agentDistances[agent] + " m\n";
 		}
 		distanceText += "\n";
 		for (var agentType in agentTypeDistances) {
-			distanceText += agentType + ": " + agentTypeDistances[agentType] + "\n";
+			distanceText += agentType + ": " + agentTypeDistances[agentType] + " m\n";
 		}
 		$("#agent-distances").text(distanceText);
 	}
@@ -382,7 +382,11 @@
 		}
 
 		if (feature.properties && feature.properties.event_content) {
-			layer.bindPopup(feature.properties.event_content);
+			var eventContent = feature.properties.event_content;
+			if (feature.properties.timestamp) {
+				eventContent += " (" + feature.properties.timestamp + ")";
+			}
+			layer.bindPopup(eventContent);
 		}
 
 		layer.on({
@@ -491,7 +495,7 @@
 	}
 
 	function showMap() {
-		$("#maplogs").text("Current Timestamp: " + timestampSteps[currentTimestampIndex]);
+		$("#maplogs").text("Timestamp: " + timestampSteps[currentTimestampIndex]);
 		createMap();
 		L.geoJSON(geoJsonData, {
 				style: addStyle,

@@ -145,7 +145,7 @@ class PlanToGeoJSONConverter(PlanParser):
             featureVector.append(feature)
         else:
             locationNode = mapParser.getNodeForLabel(location)
-            eventContent = "Initial position of %s" % agentId
+            eventContent = "%s - initial position" % agentId
             feature = self.__getPointFeatureForAgentAndCoordinates(agentId, [locationNode.getLongitude(), locationNode.getLatitude()], locationNode.getName(), 0.0, eventContent, agentType)
             feature["properties"]["init_node"] = True
             featureVector.append(feature)
@@ -158,7 +158,7 @@ class PlanToGeoJSONConverter(PlanParser):
             featureVector.append(feature)
         else:
             locationNode = mapParser.getNodeForLabel(location)
-            eventContent = "Ending position of %s (%s)" % (agentId, timestamp)
+            eventContent = "%s - ending position" % (agentId)
             feature = self.__getPointFeatureForAgentAndCoordinates(agentId, [locationNode.getLongitude(), locationNode.getLatitude()], locationNode.getName(), timestamp, eventContent, agentType)
             feature["properties"]["end_node"] = True
             featureVector.append(feature)
@@ -180,22 +180,18 @@ class PlanToGeoJSONConverter(PlanParser):
                 if len(coordinates) > 0:
                     movTimestamp = mov["timestamp"] + mov["duration"]
                     featureVector.append(self.__getLineFeatureForAgentAndCoordinates(agentId, coordinates, movTimestamp, originNode.getName(), destNode.getName(), selectedLink.getDistanceToLinkedNode(), mov["agent_type"]))
-                    eventContent = ""
-                    if mov["action"] == "travel":
-                        eventContent = "Vehicle %s travels (%s)" % (agentId, movTimestamp)
-                    elif mov["action"] == "walk":
-                        eventContent = "Pedestrian %s walks (%s)" % (agentId, movTimestamp)
+                    eventContent = "%s - %s - %s m" % (agentId, mov["action"], selectedLink.getDistanceToLinkedNode())
                     featureVector.append(self.__getPointFeatureForAgentAndCoordinates(agentId, [destNode.getLongitude(), destNode.getLatitude()], destNode.getName(), movTimestamp, eventContent, mov["agent_type"]))
             elif mov["action"] == "embark":
                 node = mapParser.getNodeForId(int(mov["location"][3:]))
                 movTimestamp = mov["timestamp"] + mov["duration"]
-                eventContent = "Pedestrian %s embarks on vehicle %s (%s)" % (agentId, mov["vehicle"], movTimestamp)
+                eventContent = "%s - get in - %s" % (agentId, mov["vehicle"])
                 label = "vehicle:%s" % mov["vehicle"]
                 featureVector.append(self.__getPointFeatureForAgentAndCoordinates(agentId, [node.getLongitude(), node.getLatitude()], label, movTimestamp, eventContent, mov["agent_type"]))
             elif mov["action"] == "debark":
                 node = mapParser.getNodeForId(int(mov["location"][3:]))
                 movTimestamp = mov["timestamp"] + mov["duration"]
-                eventContent = "Pedestrian %s gets out of vehicle %s (%s)" % (agentId, mov["vehicle"], movTimestamp)
+                eventContent = "%s - get out - %s" % (agentId, mov["vehicle"])
                 featureVector.append(self.__getPointFeatureForAgentAndCoordinates(agentId, [node.getLongitude(), node.getLatitude()], node.getName(), movTimestamp, eventContent, mov["agent_type"]))
 
     def __addAllLinksGeoJSONFeatures(self, mapParser, configObj, featureVector):
