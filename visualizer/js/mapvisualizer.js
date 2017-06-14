@@ -18,7 +18,10 @@
 	var blockedLinks = [];
 	var planLinks = [];
 
-	var lastTimestamp = 0;
+	var lastTimestampCollective = 0;
+	var lastTimestampSelfish = 0;
+	var lastCollectiveRead = false;
+
 	var readPlanInterval = null;
 	var readPlanIntervalDuration = 10000;
 
@@ -34,54 +37,82 @@
 	var lastZoomCenter = null;
 
 	var distanceChart = null;
+	var distanceChartSelfish = null;
 
-	var planUrl = "";
+	var planUrlCollective = "http://localhost:5000";
+	var planUrlSelfish = "http://localhost:5001";
 
 	var shutdownProviderOnPlanReception = true;
 
 	function readPlan(){
-		$.getJSON(planUrl, function(json){
-			if (lastTimestamp != json["timestamp"]){
-				resetVariables();
+		readCollectivePlan();
+		if (lastCollectiveRead)
+			readSelfishPlan();
+	}
+
+	function readCollectivePlan() {
+		$.getJSON(planUrlCollective, function(json){
+			if (lastTimestampCollective != json["timestamp"]){
 				geoJsonData = json["geojson"];
-				setAgentNamesAndTypes();
-				setAgentColourPairs();
-				getStreetsFromGeoJSON();
-				getTimestampsFromGeoJSON();
-				getInitialPositionsFromGeoJSON();
-				getOsmLabelCoordinatesCorrespondences();
-				getAgentTimestampsFromGeoJSON();
-				createDistanceChart();
+
+				setCollectiveVariables();
+
 				showMap();
 				showUpdatedDistances();
-				lastTimestamp = json["timestamp"];
+
+				lastTimestampCollective = json["timestamp"];
 
 				if (shutdownProviderOnPlanReception) {
-					shutdownPlanProvider();
+					shutdownPlanProvider(planUrlCollective);
 				}
+
+				lastCollectiveRead = true;
 			}
 		});
 	}
 
-	function shutdownPlanProvider(){
+	function readSelfishPlan() {
+		$.getJSON(planUrlSelfish, function(json){
+			if (lastTimestampSelfish != json["timestamp"]){
+				showUpdatedSelfishDistances(json["geojson"]);
+
+				lastTimestampSelfish = json["timestamp"];
+
+				if (shutdownProviderOnPlanReception) {
+					shutdownPlanProvider(planUrlSelfish);
+				}
+
+				lastCollectiveRead = false;
+			}
+		});
+	}
+
+	function setCollectiveVariables() {
+		cleanCollectiveVariables();
+
+		setAgentNamesAndTypes();
+		setAgentColourPairs();
+		setStreetsFromGeoJSON();
+		setTimestampsFromGeoJSON();
+		setInitialPositionsFromGeoJSON();
+		setOsmLabelCoordinatesCorrespondences();
+		setAgentTimestampsFromGeoJSON();
+
+		createCollectiveDistanceChart();
+	}
+
+	function shutdownPlanProvider(planUrl){
 		$.post(planUrl + "/shutdown");
 	}
 
-	function createDistanceChart(){
-		var chartData = [], chartColours = [];
-
-		for (var i = 0; i < agentNames.length; ++i){
-			chartData.push(0);
-			chartColours.push(agentColours[agentNames[i]]);
-		}
-
-		distanceChart = new Chart($("#distance-chart"), {
+	function createDistanceChart(domId, labels, data, colours){
+		return new Chart($("#" + domId), {
 			type: 'bar',
 			data: {
-				labels: agentNames,
+				labels: labels,
 				datasets: [{
-					data: chartData,
-					backgroundColor: chartColours
+					data: data,
+					backgroundColor: colours
 				}]
 			},
 			options: {
@@ -99,10 +130,23 @@
 		});
 	}
 
-	function resetVariables(){
+	function createCollectiveDistanceChart(){
+		var chartData = [], chartColours = [];
+
+		for (var i = 0; i < agentNames.length; ++i){
+			chartData.push(0);
+			chartColours.push(agentColours[agentNames[i]]);
+		}
+
+		if (distanceChart != null)
+			distanceChart.destroy();
+		distanceChart = createDistanceChart("distance-chart", agentNames, chartData, chartColours);
+	}
+
+	function cleanCollectiveVariables(){
 		agentNames = [];
 		agentTypes = [];
-		agentColours = {};
+		// agentColours = {}; keep same colours between executions
 		initialLocations = {};
 		agentLocations = {};
 		agentTimestamps = {};
@@ -155,22 +199,25 @@
 		$("#play-timestamp-button .nav-btn-text").text("Play");
 	}
 
-	function showUpdatedDistances(){
-		var currentTimestamp = timestampSteps[currentTimestampIndex];
-		var agentDistances = {};
-
+	function getAgentDistancesFromGeoJson(geoJson, agentDistances, agentTypeDistances, filterOnlyLowerTimestamps) {
 		for (var i = 0; i < agentNames.length; ++i) {
 			agentDistances[agentNames[i]] = 0.0;
 		}
 
-		for (var i = 0; i < geoJsonData.length; ++i) {
-			if (geoJsonData[i].properties.timestamp <= currentTimestamp && geoJsonData[i].geometry.type == "LineString") {
-				var agentId = geoJsonData[i].properties.agent_id;
-				agentDistances[agentId] += geoJsonData[i].properties.distance;
+		for (var i = 0; i < geoJson.length; ++i) {
+			if (geoJson[i].geometry.type == "LineString") {
+				var acceptEvent = true;
+				if (filterOnlyLowerTimestamps && geoJson[i].properties.timestamp > timestampSteps[currentTimestampIndex]){
+					acceptEvent = false;
+				}
+				if (acceptEvent) {
+					var agentId = geoJson[i].properties.agent_id;
+					if (agentId) {
+						agentDistances[agentId] += geoJson[i].properties.distance;
+					}
+				}
 			}
 		}
-
-		var agentTypeDistances = {};
 
 		for (var agentType in agentTypes) {
 			var agentSum = 0;
@@ -180,6 +227,11 @@
 			}
 			agentTypeDistances[agentType] = agentSum;
 		}
+	}
+
+	function showUpdatedDistances(){
+		var agentDistances = {}, agentTypeDistances = {};
+		getAgentDistancesFromGeoJson(geoJsonData, agentDistances, agentTypeDistances, true);
 
 		var distanceText = "";
 		for (var agentType in agentTypeDistances) {
@@ -192,6 +244,27 @@
 			distanceChart.data.datasets[0].data.push(agentDistances[agentNames[i]]);
 		}
 		distanceChart.update();
+	}
+
+	function showUpdatedSelfishDistances(geoJsonSelfish) {
+		var agentDistancesSelfish = {}, agentTypeDistancesSelfish = {};
+		getAgentDistancesFromGeoJson(geoJsonSelfish, agentDistancesSelfish, agentTypeDistancesSelfish, false);
+
+		var agentDistancesSelfishArray = [], agentColoursSelfish = [];
+		for (var i = 0; i < agentNames.length; ++i){
+			agentDistancesSelfishArray.push(agentDistancesSelfish[agentNames[i]]);
+			agentColoursSelfish.push(agentColours[agentNames[i]]);
+		}
+
+		var distanceText = "";
+		for (var agentType in agentTypeDistancesSelfish) {
+			distanceText += agentType + ": " + agentTypeDistancesSelfish[agentType] + " m\n";
+		}
+		$("#agent-distances-selfish").text(distanceText.trim());
+
+		if (distanceChartSelfish != null)
+			distanceChartSelfish.destroy();
+		distanceChartSelfish = createDistanceChart("distance-chart-selfish", agentNames, agentDistancesSelfishArray, agentColoursSelfish);
 	}
 
 	function setAgentNamesAndTypes(){
@@ -216,7 +289,7 @@
 		}
 	}
 
-	function getStreetsFromGeoJSON(){
+	function setStreetsFromGeoJSON(){
 		for (var i = 0; i < geoJsonData.length; ++i) {
 			if (geoJsonData[i].properties.original_link) {
 				var startLabel = geoJsonData[i].properties.start_label;
@@ -245,7 +318,7 @@
 		}
 	}
 
-	function getTimestampsFromGeoJSON(){
+	function setTimestampsFromGeoJSON(){
 		for (var i = 0; i < geoJsonData.length; ++i){
 			var ts = geoJsonData[i].properties.timestamp;
 			if (ts != null && timestampSteps.indexOf(ts) < 0){
@@ -257,7 +330,7 @@
 		});
 	}
 
-	function getInitialPositionsFromGeoJSON(){
+	function setInitialPositionsFromGeoJSON(){
 		for (var i = 0; i < geoJsonData.length; ++i){
 			var isInit = geoJsonData[i].properties.init_node;
 			if (isInit){
@@ -269,7 +342,7 @@
 		agentLocations = JSON.parse(JSON.stringify(initialLocations));
 	}
 
-	function getOsmLabelCoordinatesCorrespondences(){
+	function setOsmLabelCoordinatesCorrespondences(){
 		for (var i = 0; i < geoJsonData.length; ++i){
 			if (geoJsonData[i].geometry.type == "Point") {
 				var label = geoJsonData[i].properties.node_label;
@@ -279,7 +352,7 @@
 		}
 	}
 
-	function getAgentTimestampsFromGeoJSON(){
+	function setAgentTimestampsFromGeoJSON(){
 		for (var i = 0; i < geoJsonData.length; ++i){
 			if (geoJsonData[i].geometry.type == "Point") {
 				var agent = geoJsonData[i].properties.agent_id;
@@ -585,22 +658,21 @@
 		}
 	}
 
-	function getPlanPortListenerFromUrl(){
-		var urlParams = window.location.search.substr(1);
-		var urlParamsSplit = urlParams.split("&");
-		for (var i = 0; i < urlParamsSplit.length; ++i) {
-			var keyValue = urlParamsSplit[i].split("=");
-			if (keyValue.length == 2) {
-				if (keyValue[0] == "port") {
-					return parseInt(keyValue[1]);
-				}
-			}
-		}
-		return 5000;
-	}
+//	function getPlanPortListenerFromUrl(){
+//		var urlParams = window.location.search.substr(1);
+//		var urlParamsSplit = urlParams.split("&");
+//		for (var i = 0; i < urlParamsSplit.length; ++i) {
+//			var keyValue = urlParamsSplit[i].split("=");
+//			if (keyValue.length == 2) {
+//				if (keyValue[0] == "port") {
+//					return parseInt(keyValue[1]);
+//				}
+//			}
+//		}
+//		return 5000;
+//	}
 
 	$(document).ready(function(){
-		planUrl = "http://localhost:" + getPlanPortListenerFromUrl();
 		readPlanInterval = setInterval(readPlan, readPlanIntervalDuration);
 	});
 
