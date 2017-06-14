@@ -256,11 +256,11 @@
 			agentColoursSelfish.push(agentColours[agentNames[i]]);
 		}
 
-		var distanceText = "";
+		var totalDistance = 0;
 		for (var agentType in agentTypeDistancesSelfish) {
-			distanceText += agentType + ": " + agentTypeDistancesSelfish[agentType] + " m\n";
+			totalDistance += agentTypeDistancesSelfish[agentType];
 		}
-		$("#agent-distances-selfish").text(distanceText.trim());
+		$("#agent-distances-selfish").text("Total distance: " + totalDistance);
 
 		if (distanceChartSelfish != null)
 			distanceChartSelfish.destroy();
