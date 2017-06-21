@@ -45,3 +45,15 @@
 #distance-chart, #distance-chart-selfish {
 	width: 100%;
 }
+
+@keyframes highlight {
+	0%   {background-color: rgba(240, 255, 46, 0.62);}
+	50%  {background-color: rgba(255, 255, 0, 0);}
+	100% {background-color: rgba(240, 255, 46, 0.62);}
+}
+
+.highlighted-marker {
+	animation-name: highlight;
+	animation-duration: 2s;
+	animation-iteration-count: infinite;
+}

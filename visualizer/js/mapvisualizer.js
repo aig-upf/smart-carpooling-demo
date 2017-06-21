@@ -43,7 +43,7 @@
 	var planUrlCollective = "http://localhost:5000";
 	var planUrlSelfish = "http://localhost:5001";
 
-	var shutdownProviderOnPlanReception = false;
+	var shutdownProviderOnPlanReception = true;
 
 	function readPlan(){
 		readCollectivePlan();
@@ -412,7 +412,7 @@
 					infoText += "]";
 				}
 				labels.push(
-					"<i class='legend-item' style='background:" + col + ";'><b>" + agentId + "</b> " + infoText + "</i>");
+					"<i class='legend-item' data-agent='" + agentId  + "'style='background:" + col + ";'><b>" + agentId + "</b> " + infoText + "</i>");
 			}
 
 			div.innerHTML = labels.join('<br>');
@@ -481,7 +481,7 @@
 		else if (feature.properties.agent_type == "vehicle"){
 			iconName = "car";
 		}
-		var icon = L.MakiMarkers.icon({icon: iconName, color: agentColours[agentId], size: "m"});
+		var icon = L.MakiMarkers.icon({icon: iconName, color: agentColours[agentId], size: "m", className: agentId +"-marker"});
 		return L.marker(latlng, {icon: icon});
 	}
 
@@ -671,6 +671,25 @@
 		}
 	}
 
+	function highlightAgentAndEnsembles(agentId, doHighlight){
+		var agentsToHighlight = [agentId];
+		if (ensemblesData != null && ensemblesData[agentId] != null) {
+			for (var i = 0; i < ensemblesData[agentId].length; ++i) {
+				agentsToHighlight.push(ensemblesData[agentId][i]);
+			}
+		}
+
+		for (var i = 0; i < agentsToHighlight.length; ++i) {
+			var nodes = $("." + agentsToHighlight[i] + "-marker");
+			if (doHighlight) {
+				nodes.addClass("highlighted-marker");
+			}
+			else {
+				nodes.removeClass("highlighted-marker");
+			}
+		}
+	}
+
 //	function getPlanPortListenerFromUrl(){
 //		var urlParams = window.location.search.substr(1);
 //		var urlParamsSplit = urlParams.split("&");
@@ -750,5 +769,15 @@
 	$(document).on("click", "#toggle-block-planned-link-button", function(){
 		var numBlocked = parseInt($("#num-block-planned-link").val());
 		toggleBlockRandomPlannedLinks(numBlocked);
+	});
+
+	$(document).on("mouseover", ".legend-item", function(e){
+		var agentId = $(this).attr("data-agent");
+		highlightAgentAndEnsembles(agentId, true);
+	});
+
+	$(document).on("mouseout", ".legend-item", function(e){
+		var agentId = $(this).attr("data-agent");
+		highlightAgentAndEnsembles(agentId, false);
 	});
 }());
