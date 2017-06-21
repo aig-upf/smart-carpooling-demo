@@ -133,7 +133,7 @@ def convertLastPlanToGeoJSON(mapParser, configObj):
         planParser = PlanToGeoJSONConverter()
         planParser.parse(lastPlanFile)
         geoJsonFeatures = planParser.getGeoJSON(mapParser, configObj)
-        retObj = {"geojson": geoJsonFeatures, "timestamp": int(time.time())}
+        retObj = {"geojson": geoJsonFeatures, "ensembles": planParser.getEnsembles(), "timestamp": int(time.time())}
         return json.dumps(retObj)
     else:
         print "Error: There was not any plan to GeoJSONify"

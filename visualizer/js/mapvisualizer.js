@@ -7,6 +7,7 @@
 	var agentColours = {};
 	var myMap = null;
 	var geoJsonData = null;
+	var ensemblesData = null;
 
 	var timestampSteps = [];
 	var currentTimestampIndex = 0;
@@ -42,7 +43,7 @@
 	var planUrlCollective = "http://localhost:5000";
 	var planUrlSelfish = "http://localhost:5001";
 
-	var shutdownProviderOnPlanReception = true;
+	var shutdownProviderOnPlanReception = false;
 
 	function readPlan(){
 		readCollectivePlan();
@@ -54,6 +55,7 @@
 		$.getJSON(planUrlCollective, function(json){
 			if (lastTimestampCollective != json["timestamp"]){
 				geoJsonData = json["geojson"];
+				ensemblesData = json["ensembles"];
 
 				setCollectiveVariables();
 
@@ -398,8 +400,19 @@
 
 			for (var agentId in agentColours){
 				var col = agentColours[agentId];
+				var infoText = "";
+				if (ensemblesData != null && ensemblesData[agentId] != null && ensemblesData[agentId].length > 0) {
+					infoText = "[";
+					for (var i = 0; i < ensemblesData[agentId].length; ++i) {
+						if (i > 0){
+							infoText += ", ";
+						}
+						infoText += ensemblesData[agentId][i];
+					}
+					infoText += "]";
+				}
 				labels.push(
-					"<i class='legend-item' style='background:" + col + ";'>" + agentId + "</i>");
+					"<i class='legend-item' style='background:" + col + ";'><b>" + agentId + "</b> " + infoText + "</i>");
 			}
 
 			div.innerHTML = labels.join('<br>');

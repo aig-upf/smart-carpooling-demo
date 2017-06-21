@@ -49,6 +49,18 @@ class PlanParser:
                                     "agent_type": "pedestrian"}
                         self.pedestrianMovements[pedestrianId].append(infoItem)
 
+    def getEnsembles(self):
+        ensembles = {}
+        for vehicle in self.vehicleMovements:
+            ensembles[vehicle] = []
+        for pedestrian in self.pedestrianMovements:
+            for mov in self.pedestrianMovements[pedestrian]:
+                if mov["action"] == "embark" or mov["action"] == "debark":
+                    vehicleId = mov["vehicle"]
+                    if pedestrian not in ensembles[vehicleId]:
+                        ensembles[vehicleId].append(pedestrian)
+        return ensembles
+
     def compareMovements(self, mov1, mov2):
         if mov1["timestamp"] > mov2["timestamp"]:
             return 1
@@ -106,7 +118,6 @@ class PlanToJSONConverter(PlanParser):
 class PlanToGeoJSONConverter(PlanParser):
     def getGeoJSON(self, mapParser, configObj):
         featureVector = []
-
         for pedestrian in configObj["pedestrians"]:
             agentId = pedestrian["id"]
             self.__addGeoJSONFeatureForInitPosition(agentId, pedestrian["init_pos"], mapParser, featureVector, "pedestrian")
