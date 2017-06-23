@@ -1,12 +1,12 @@
 .legend {
 	background: rgba(255, 255, 255, 0.75);
 	padding: 5px;
-	width: 80%;
+	width: 30%;
 	padding-bottom: 30px;
 }
 
 .legend-item {
-	min-width: 98%;
+	min-width: 92%;
 	position: absolute;
 	text-align: center;
 }
