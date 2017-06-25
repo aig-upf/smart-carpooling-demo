@@ -44,7 +44,7 @@
 	:duration (= ?duration (/ (distance ?x ?y) (velocity ?p ?x ?y)))
 	:condition (and
 					(at start (at ?p ?x))
-					(at start (has-footpath ?p ?x ?y))
+					(over all (has-footpath ?p ?x ?y))
 				)
 	:effect	(and
 					(at end (at ?p ?y))
@@ -56,7 +56,7 @@
 	:duration (= ?duration (/ (distance ?x ?y) (velocity ?v ?x ?y)))
 	:condition (and
 					(at start (at ?v ?x))
-					(at start (has-street ?x ?y))
+					(over all (has-street ?x ?y))
 				)
 	:effect	(and
 					(at end (at ?v ?y))
