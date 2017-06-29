@@ -24,7 +24,7 @@
 	var lastCollectiveRead = false;
 
 	var readPlanInterval = null;
-	var readPlanIntervalDuration = 10000;
+	var readPlanIntervalDuration = 5000;
 
 	var agentLocations = {};
 	var initialLocations = {};
