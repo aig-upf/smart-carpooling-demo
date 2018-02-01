@@ -71,7 +71,7 @@ def getLinksInWalkRange(currentNode, linksList, remainingDistance, visitedNodeId
                     getLinksInWalkRange(link.getLinkedNode(), linksList, newRemainingDistance, visitedNodeIds)
 
 
-def getPedestrians(regionNodes, numPedestrians, carsInfomation):
+def getPedestrians(regionNodes, numPedestrians, minWalk, maxWalk, carsInfomation):
     pedestrians = []
     pedestrianLinks = []
     pedestrianNodeIds = set()
@@ -80,7 +80,7 @@ def getPedestrians(regionNodes, numPedestrians, carsInfomation):
         pedestrianId = "p%d" % (i + 1)
         randomOriginNode = regionNodes[randint(0, len(regionNodes) - 1)]
         randomDestNode = regionNodes[randint(0, len(regionNodes) - 1)]
-        walkRange = randint(args.minwalk, args.maxwalk)
+        walkRange = randint(minWalk, maxWalk)
 
         pedestrian = {"id": pedestrianId, "init_pos": randomOriginNode.getName(), "target_pos": randomDestNode.getName(), "walk_range": walkRange}
         if carsInfomation is not None:
@@ -127,28 +127,51 @@ def getCarpools(regionNodes, numCarpools, pedestrianNodeIds, blockPedestrianLink
     return carpools
 
 
-if __name__ == "__main__":
-    args = getArguments()
-
+def generateRandomScenerario(mapPath, numPedestrians, numCarpools, minLatitude, maxLatitude, minLongitude, maxLongitude, minWalk, maxWalk, blockPedestrianLinks=False, carInfoPath=None):
     mapParser = OpenStreeMapParser()
-    mapParser.parse(args.map)
+    mapParser.parse(mapPath)
 
     carsInfomation = None
-    if args.carinfo is not None:
+    if carInfoPath is not None:
         carsInfomation = CarDataManager()
-        carsInfomation.parseCarDataFile(args.carinfo)
+        carsInfomation.parseCarDataFile(carInfoPath)
 
-    regionNodes = mapParser.getNodesForRegion(args.minlat, args.maxlat, args.minlon, args.maxlon)
+    regionNodes = mapParser.getNodesForRegion(minLatitude, maxLatitude, minLongitude, maxLongitude)
 
-    pedestrians, pedestrianLinks, pedestrianNodeIds, pedestrianNodeIdsMap = getPedestrians(regionNodes, args.pedestrians, carsInfomation)
-    carpools = getCarpools(regionNodes, args.carpools, pedestrianNodeIds, args.block_pedestrian_links, carsInfomation)
+    pedestrians, pedestrianLinks, pedestrianNodeIds, pedestrianNodeIdsMap = getPedestrians(regionNodes, numPedestrians, minWalk, maxWalk, carsInfomation)
+    carpools = getCarpools(regionNodes, numCarpools, pedestrianNodeIds, blockPedestrianLinks, carsInfomation)
 
-    finalObj = {"carpools": carpools, "pedestrians": pedestrians, "blocked_streets": []}
-    if args.block_pedestrian_links:
+    finalObj = {"carpools": carpools,
+                "pedestrians": pedestrians,
+                "blocked_streets": [],
+                "map_path": mapPath,
+                "map_boundaries": {
+                    "min_latitude": minLatitude,
+                    "max_latitude": maxLatitude,
+                    "min_longitude": minLongitude,
+                    "max_longitude": maxLongitude
+                }
+               }
+
+    if blockPedestrianLinks:
         for blocked in pedestrianLinks:
             finalObj["blocked_streets"].append({"init_pos": blocked.getOriginNode().getName(), "target_pos": blocked.getLinkedNode().getName()})
-    finalObjStr = json.dumps(finalObj)
 
     with open("random_init.json", 'w') as f:
-        f.write(finalObjStr)
+        json.dump(finalObj, f, indent=4)
         print "Initial random positions exported to 'random_init.json'"
+
+
+if __name__ == "__main__":
+    args = getArguments()
+    generateRandomScenerario(args.map, \
+                             args.pedestrians, \
+                             args.carpools, \
+                             args.minlat, \
+                             args.maxlat, \
+                             args.minlon, \
+                             args.maxlon, \
+                             args.minwalk, \
+                             args.maxwalk, \
+                             args.block_pedestrian_links, \
+                             args.carinfo)
