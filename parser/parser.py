@@ -4,9 +4,6 @@ import sys
 import argparse
 import json
 import os, shutil
-import webbrowser
-from flask import Flask, request
-from flask_cors import CORS, cross_origin
 import time
 from multiprocessing import Process
 
@@ -169,13 +166,6 @@ def parseMapFile(mapParser, mapPath, configFilePath):
         mapParser.parse(mapAbsPath)
 
 
-def openMapVisualizer(baseFolder, visualizerPort):
-    visualizePage = "file://" + os.path.realpath(baseFolder + "/visualizer/index.html") + "?port=" + str(visualizerPort)
-    try:
-        webbrowser.get("google-chrome").open_new_tab(visualizePage)
-    except:
-        webbrowser.open_new_tab(visualizePage)
-
 def getProcessForConfigObj(configObj, mapParser, baseFolder, partId, argTime, argMemory):
     problemFolder = "part_%s" % partId
     os.makedirs(problemFolder)
@@ -232,22 +222,6 @@ def solveCooperativeProblem(mapParser, configObj, baseFolder, argTime, argMemory
     runPlanner(baseFolder, argTime, argMemory, problemFileName, planFilePrefix, argIteratedSolution)
 
 
-app = Flask(__name__)
-CORS(app)
-geoJsonPlan = None
-
-@app.route("/")
-def serveGeoJsonPlan():
-    return geoJsonPlan
-
-@app.route("/shutdown", methods=["POST"])
-def shutdown():
-    func = request.environ.get("werkzeug.server.shutdown")
-    if func is not None:
-        func()
-        print "Exiting..."
-
-
 if __name__ == "__main__":
     args = getArguments()
     baseFolder = os.path.dirname(os.path.realpath(sys.argv[0] + "/.."))
@@ -272,13 +246,7 @@ if __name__ == "__main__":
         if args.json:
             convertAllPlansToJSON(mapParser, configObj)
         if args.visualize:
-            geoJsonPlan = convertLastPlanToGeoJSON(mapParser, configObj)
-            if geoJsonPlan is not None:
-                visualizerPort = 5000
-                if solutionType == "selfish":
-                    visualizerPort = 5001
-                # openMapVisualizer(baseFolder, visualizerPort)
-                app.run(port=visualizerPort)
+            convertLastPlanToGeoJSON(mapParser, configObj)
 
 '''
     (46.0643, 46.0715, 11.1164, 11.1272) # 1125 nodes
