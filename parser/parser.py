@@ -116,15 +116,15 @@ def convertPlanToJSON(mapParser, configObj, planFile):
     planFileName = "%s.json" % planFile
     with open(planFileName, "w") as f:
         print "Writing JSONed plan to %s" % planFileName
-        f.write(json.dumps(planParser.getJSON(mapParser)))
+        json.dump(planParser.getJSON(mapParser), f, indent=4)
 
 
 def convertLastPlanToGeoJSON(mapParser, configObj):
     lastPlanFile = None
-    solutionType = None
+    solutionType = "cooperative"
     if "solution_type" in configObj:
         solutionType = configObj["solution_type"]
-    if solutionType is None or solutionType == "cooperative":
+    if solutionType == "cooperative":
         lastPlanFile = getLastPlanFileName()
     elif solutionType == "selfish":
         lastPlanFile = "tmp_sas_plan"
@@ -134,7 +134,11 @@ def convertLastPlanToGeoJSON(mapParser, configObj):
         planParser.parse(lastPlanFile)
         geoJsonFeatures = planParser.getGeoJSON(mapParser, configObj)
         retObj = {"geojson": geoJsonFeatures, "ensembles": planParser.getEnsembles(), "timestamp": int(time.time())}
-        return json.dumps(retObj)
+
+        geoJsonPlanName = "%s_tmp_sas_plan.geojson" % solutionType
+        with open(geoJsonPlanName, 'w') as f:
+            print "Writing GeoJSONed plan to %s" % geoJsonPlanName
+            json.dump(retObj, f, indent=4)
     else:
         print "Error: There was not any plan to GeoJSONify"
         return None
@@ -254,10 +258,10 @@ if __name__ == "__main__":
     exportLabelCorrespondences(mapParser)
 
     if args.plan:
-        solutionType = None
+        solutionType = "cooperative"
         if "solution_type" in configObj:
             solutionType = configObj["solution_type"]
-        if (solutionType is None) or (solutionType == "cooperative"):
+        if solutionType == "cooperative":
             solveCooperativeProblem(mapParser, configObj, baseFolder, args.time, args.memory, args.iterated)
         elif solutionType == "selfish":
             solveSelfishProblem(mapParser, configObj, baseFolder, args.time, args.memory)

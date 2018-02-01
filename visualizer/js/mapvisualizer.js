@@ -40,10 +40,8 @@
 	var distanceChart = null;
 	var distanceChartSelfish = null;
 
-	var planUrlCollective = "http://localhost:5000";
-	var planUrlSelfish = "http://localhost:5001";
-
-	var shutdownProviderOnPlanReception = true;
+	var planUrlCollective = "http://localhost:5000/get_cooperative_plan";
+	var planUrlSelfish = "http://localhost:5000/get_selfish_plan";
 
 	function readPlan(){
 		readCollectivePlan();
@@ -64,10 +62,6 @@
 
 				lastTimestampCollective = json["timestamp"];
 
-				if (shutdownProviderOnPlanReception) {
-					shutdownPlanProvider(planUrlCollective);
-				}
-
 				lastCollectiveRead = true;
 			}
 		});
@@ -79,10 +73,6 @@
 				showUpdatedSelfishDistances(json["geojson"]);
 
 				lastTimestampSelfish = json["timestamp"];
-
-				if (shutdownProviderOnPlanReception) {
-					shutdownPlanProvider(planUrlSelfish);
-				}
 
 				lastCollectiveRead = false;
 			}
@@ -101,10 +91,6 @@
 		setAgentTimestampsFromGeoJSON();
 
 		createCollectiveDistanceChart();
-	}
-
-	function shutdownPlanProvider(planUrl){
-		$.post(planUrl + "/shutdown");
 	}
 
 	function createDistanceChart(domId, labels, data, colours){
@@ -737,16 +723,25 @@
 		showUpdatedDistances();
 	});
 
+    $(document).on("click", "#generate-scenario-button", function(){
+        stopPlayInterval();
+        var targetUrl = "http://localhost:5000/generate_scenario";
+        $.get(targetUrl, function(cosa){
+            alert(cosa);
+            $("#generate-scenario-button").prop("disabled", true);
+        });
+    });
+
 	$(document).on("click", "#send-current-state-button", function(){
 		stopPlayInterval();
-		var targetUrl = "http://178.239.178.239:8080/sendAdaptation.php";
+		var targetUrl = "http://localhost:5000/run_adaptation";
 		var retJSON = {
-										'adaptations': {
-											'agents': agentLocations,
-											'blocked_streets': getAllBlockedLinks(),
-											'id': currentAdaptationId
-										}
-									};
+                        "adaptations": {
+                            "agents": agentLocations,
+                            "blocked_streets": getAllBlockedLinks(),
+                            "id": currentAdaptationId
+                        }
+                      };
 
 		$.ajax({
 			"url": targetUrl,
