@@ -51,8 +51,8 @@ def getLastPlanFileName():
 def runPlanner(baseFolder, time, memory, problemFile, planFilePrefix, iteratedSolution):
     removeExistingJSONPlans()
     print "Planning..."
-    tmpPlanningFolder = os.path.realpath(baseFolder + "/../temporal-planning")
-    domainFile = baseFolder + "/domains/domain.pddl"
+    tmpPlanningFolder = os.path.realpath(os.path.join(baseFolder, "../temporal-planning"))
+    domainFile = os.path.join(baseFolder, "domains/domain.pddl")
     iteratedFlag = None
     if iteratedSolution:
         iteratedFlag = "--iterated"
@@ -162,7 +162,7 @@ def parseMapFile(mapParser, mapPath, configFilePath):
         mapParser.parse(mapPath)
     else:
         configFolder = os.path.dirname(os.path.realpath(configFilePath))
-        mapAbsPath = os.path.realpath(configFolder + '/' + mapPath)
+        mapAbsPath = os.path.realpath(os.path.join(configFolder, mapPath))
         mapParser.parse(mapAbsPath)
 
 
@@ -222,31 +222,35 @@ def solveCooperativeProblem(mapParser, configObj, baseFolder, argTime, argMemory
     runPlanner(baseFolder, argTime, argMemory, problemFileName, planFilePrefix, argIteratedSolution)
 
 
-if __name__ == "__main__":
-    args = getArguments()
-    baseFolder = os.path.dirname(os.path.realpath(sys.argv[0] + "/.."))
-    configObj = parseConfigFile(args.config)
+def solveSmartCarpoolingProblem(baseFolder, configFilePath, doPlan=False, outputJSON=False, outputGeoJSON=False, timeLimit=3600, memoryLimit=4096, iteratedSolution=False):
+    configObj = parseConfigFile(configFilePath)
 
     mapParser = OpenStreeMapParser()
-    parseMapFile(mapParser, configObj["map_path"], args.config)
+    parseMapFile(mapParser, configObj["map_path"], configFilePath)
     exportLabelCorrespondences(mapParser)
 
-    if args.plan:
+    if doPlan:
         solutionType = "cooperative"
         if "solution_type" in configObj:
             solutionType = configObj["solution_type"]
         if solutionType == "cooperative":
-            solveCooperativeProblem(mapParser, configObj, baseFolder, args.time, args.memory, args.iterated)
+            solveCooperativeProblem(mapParser, configObj, baseFolder, timeLimit, memoryLimit, iteratedSolution)
         elif solutionType == "selfish":
-            solveSelfishProblem(mapParser, configObj, baseFolder, args.time, args.memory)
+            solveSelfishProblem(mapParser, configObj, baseFolder, timeLimit, memoryLimit)
         else:
             print "Error: Incorrect solution type"
             exit(-1)
 
-        if args.json:
+        if outputJSON:
             convertAllPlansToJSON(mapParser, configObj)
-        if args.visualize:
+        if outputGeoJSON:
             convertLastPlanToGeoJSON(mapParser, configObj)
+
+
+if __name__ == "__main__":
+    args = getArguments()
+    baseFolder = os.path.dirname(os.path.realpath(os.path.join(sys.argv[0], "..")))
+    solveSmartCarpoolingProblem(baseFolder, args.config, args.plan, args.json, args.visualize)
 
 '''
     (46.0643, 46.0715, 11.1164, 11.1272) # 1125 nodes
