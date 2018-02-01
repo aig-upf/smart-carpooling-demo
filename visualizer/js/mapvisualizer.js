@@ -726,9 +726,8 @@
     $(document).on("click", "#generate-scenario-button", function(){
         stopPlayInterval();
         var targetUrl = "http://localhost:5000/generate_scenario";
-        $.get(targetUrl, function(cosa){
-            alert(cosa);
-            $("#generate-scenario-button").prop("disabled", true);
+        $.get(targetUrl, function(){
+            $("#generate-scenario-button").prop("disabled", true);  // block button on success
         });
     });
 
