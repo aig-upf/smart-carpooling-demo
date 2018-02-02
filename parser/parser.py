@@ -222,6 +222,51 @@ def solveCooperativeProblem(mapParser, configObj, baseFolder, argTime, argMemory
     runPlanner(baseFolder, argTime, argMemory, problemFileName, planFilePrefix, argIteratedSolution)
 
 
+def modifConfigurationWithAdaptations(configObj, adaptations):
+    if (adaptations is not None) and (adaptations["adaptations"] is not None):
+        blockedStreets = adaptations["adaptations"]["blocked_streets"]
+        if blockedStreets is not None:
+            configObj["blocked_streets"] = blockedStreets
+        agents = adaptations["adaptations"]["agents"]
+        if agents is not None:
+            pedestrians = configObj["pedestrians"]
+            carpools = configObj["carpools"]
+            for p in pedestrians:
+                if p["id"] in agents:
+                    p["init_pos"] = agents[p["id"]]
+                else:
+                    p["init_pos"] = p["target_pos"]  # assume they have reached their target
+            for c in carpools:
+                if c["id"] in agents:
+                    c["init_pos"] = agents[c["id"]]
+                else:
+                    c["init_pos"] = c["target_pos"]  # assume they have reached their target
+
+
+def createSelfishConfigurationFromCooperative(cooperativeConfigObj):
+    selfishConfigObj = dict(cooperativeConfigObj)
+    selfishConfigObj["solution_type"] = "selfish"
+
+    selfishConfigObj["carpools"].extend(selfishConfigObj["pedestrians"])
+    selfishConfigObj["pedestrians"] = []
+
+    return selfishConfigObj
+
+
+def solveSmartCarpoolingProblemWithAdaptations(baseFolder, configFilePath, adaptations, doPlan=False, outputJSON=False, outputGeoJSON=False, timeLimit=3600, memoryLimit=4096, iteratedSolution=False):
+    configObj = parseConfigFile(configFilePath)
+    modifConfigurationWithAdaptations(configObj, adaptations)
+    with open("cooperative_scenario.json", 'w') as f:
+        json.dump(configObj, f, indent=4)
+
+    selfishConfigObj = createSelfishConfigurationFromCooperative(configObj)
+    with open("selfish_scenario.json", 'w') as f:
+        json.dump(selfishConfigObj, f, indent=4)
+
+    solveSmartCarpoolingProblem(baseFolder, "cooperative_scenario.json", doPlan, outputJSON, outputGeoJSON, timeLimit, memoryLimit, iteratedSolution)
+    solveSmartCarpoolingProblem(baseFolder, "selfish_scenario.json", doPlan, outputJSON, outputGeoJSON, timeLimit, memoryLimit, iteratedSolution)
+
+
 def solveSmartCarpoolingProblem(baseFolder, configFilePath, doPlan=False, outputJSON=False, outputGeoJSON=False, timeLimit=3600, memoryLimit=4096, iteratedSolution=False):
     configObj = parseConfigFile(configFilePath)
 
