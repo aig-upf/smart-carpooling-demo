@@ -17,11 +17,20 @@ sefishLastPlanName = "selfish_tmp_sas_plan.geojson"
 
 baseFolder = None
 
-@app.route("/generate_scenario")
+@app.route("/generate_scenario", methods=['GET', 'POST'])
 def generateRandomScenerario():
-    randominit.generateRandomScenerario("../trento/Trento.world", 2, 2, 46.0643, 46.0715, 11.1164, 11.1272, 0, 10)
+    requestObj = request.json
+    randominit.generateRandomScenerario("../trento/Trento.world", \
+                                        requestObj["passengers"], \
+                                        requestObj["carpools"], \
+                                        requestObj["min_latitude"], \
+                                        requestObj["max_latitude"], \
+                                        requestObj["min_longitude"], \
+                                        requestObj["max_longitude"], \
+                                        requestObj["min_walk_range"], \
+                                        requestObj["max_walk_range"])
     parser.solveSmartCarpoolingProblem(baseFolder, "random_init.json", True, True, True)
-    return "Done!"
+    return "Success"
 
 
 @app.route("/get_cooperative_plan")
@@ -55,7 +64,7 @@ def getLastSelfishPlan():
 @app.route("/run_adaptation", methods=['GET', 'POST'])
 def runAdaptation():
     parser.solveSmartCarpoolingProblemWithAdaptations(baseFolder, "random_init.json", request.json, True, True, True)
-    return "Hello"
+    return "Sucess"
 
 
 def removeGeoJSONFiles():

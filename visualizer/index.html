@@ -63,7 +63,7 @@
         <span class="label label-default center-block">Adaptations Management</span>
         <div class="btn-group btn-group-justified" role="group" aria-label="...">
             <div class="btn-group">
-                <button id="generate-scenario-button" class="btn btn-default btn-group-justified" type="button">
+                <button id="open-scenario-config-button" class="btn btn-default btn-group-justified" type="button">
                   <span class="glyphicon glyphicon-road"></span><span> </span>Generate scenario
                 </button>
             </div>
@@ -107,6 +107,60 @@
         </div>
       </div>
       -->
+    </div>
+    <div id="random-scenario-modal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Generate scenario</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group col-sm-6">
+                            <label for="num-passengers">Number of passengers:</label>
+                            <input type="number" class="form-control" id="num-passengers" value="2">
+                        </div>
+                        <div class="form-group col-sm-6">
+                            <label for="num-carpools">Number of carpools:</label>
+                            <input type="number" class="form-control" id="num-carpools" value="2">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-sm-3">
+                            <label for="min-latitude">Minimum latitude:</label>
+                            <input type="number" class="form-control" id="min-latitude" value="46.0643" disabled>
+                        </div>
+                        <div class="form-group col-sm-3">
+                            <label for="max-latitude">Maximum latitude:</label>
+                            <input type="number" class="form-control" id="max-latitude" value="46.0715" disabled>
+                        </div>
+                        <div class="form-group col-sm-3">
+                            <label for="min-longitude">Minimum longitude:</label>
+                            <input type="number" class="form-control" id="min-longitude" value="11.1164" disabled>
+                        </div>
+                        <div class="form-group col-sm-3">
+                            <label for="max-longitude">Maximum longitude:</label>
+                            <input type="number" class="form-control" id="max-longitude" value="11.1272" disabled>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-sm-6">
+                            <label for="min-walk-range">Minimum walk range:</label>
+                            <input type="number" class="form-control" id="min-walk-range" value="0" disabled>
+                        </div>
+                        <div class="form-group col-sm-6">
+                            <label for="max-walk-range">Maximum walk range:</label>
+                            <input type="number" class="form-control" id="max-walk-range" value="10" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="create-random-scenario-button" type="button" class="btn btn-primary">Create</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
   </body>
 </html>

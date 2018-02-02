@@ -723,10 +723,34 @@
 		showUpdatedDistances();
 	});
 
-    $(document).on("click", "#generate-scenario-button", function(){
+    $(document).on("click", "#open-scenario-config-button", function(){
+        $("#random-scenario-modal").modal("show");
+    });
+
+    $(document).on("click", "#create-random-scenario-button", function(){
+        var sendObj = {"passengers": parseInt($("#num-passengers").val()),
+                       "carpools": parseInt($("#num-carpools").val()),
+                       "min_latitude": parseFloat($("#min-latitude").val()),
+                       "max_latitude": parseFloat($("#max-latitude").val()),
+                       "min_longitude": parseFloat($("#min-longitude").val()),
+                       "max_longitude": parseFloat($("#max-longitude").val()),
+                       "min_walk_range": parseInt($("#min-walk-range").val()),
+                       "max_walk_range": parseInt($("#max-walk-range").val())
+                      };
+
+        $("#random-scenario-modal").modal("hide");
         stopPlayInterval();
+
         var targetUrl = "http://localhost:5000/generate_scenario";
-        $.get(targetUrl, function(){
+        $.ajax({
+            "url": targetUrl,
+            "method": "POST",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "data": JSON.stringify(sendObj)
+        })
+        .done(function(response){
             $("#generate-scenario-button").prop("disabled", true);  // block button on success
         });
     });
