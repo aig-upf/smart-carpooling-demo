@@ -832,8 +832,7 @@ public class CollectiveMobility {
 							coordinates.add(coord);
 						}
 
-						double res = Distance.TotalDistance(coordinates);
-						totalDistanceVehicle = (totalDistanceVehicle + res);
+						totalDistanceVehicle = Distance.TotalDistance(coordinates);
 						// System.out.println("PATH COMPLETO: "
 						// + totalDistanceVehicle);
 
