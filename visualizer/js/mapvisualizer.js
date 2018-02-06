@@ -62,6 +62,8 @@
 
 				lastTimestampCollective = json["timestamp"];
 
+				showNotification("Collective solution read", "success")
+
 				lastCollectiveRead = true;
 			}
 		});
@@ -73,6 +75,8 @@
 				showUpdatedSelfishDistances(json["geojson"]);
 
 				lastTimestampSelfish = json["timestamp"];
+
+				showNotification("Selfish solution read", "success")
 
 				lastCollectiveRead = false;
 			}
@@ -676,6 +680,15 @@
 		}
 	}
 
+	function showNotification(message, type) {
+		$.notify({
+			message: message
+		},{
+			type: type,
+			delay: 3000
+		});
+	}
+
 //	function getPlanPortListenerFromUrl(){
 //		var urlParams = window.location.search.substr(1);
 //		var urlParamsSplit = urlParams.split("&");
@@ -728,6 +741,8 @@
     });
 
     $(document).on("click", "#create-random-scenario-button", function(){
+        showNotification("Generating a new scenario...", "info");
+
         var sendObj = {"passengers": parseInt($("#num-passengers").val()),
                        "carpools": parseInt($("#num-carpools").val()),
                        "min_latitude": parseFloat($("#min-latitude").val()),
@@ -750,12 +765,18 @@
             },
             "data": JSON.stringify(sendObj)
         })
+        .fail(function(){
+            showNotification("Could not generate a new scenario", "danger");
+        })
         .done(function(response){
-            $("#generate-scenario-button").prop("disabled", true);  // block button on success
+            showNotification("Scenario successfully generated!", "success");
+            // $("#open-scenario-config-button").prop("disabled", true);  // block button on success
         });
     });
 
 	$(document).on("click", "#send-current-state-button", function(){
+		showNotification("Sending current state to get a new solution", "info");
+
 		stopPlayInterval();
 		var targetUrl = "http://localhost:5000/run_adaptation";
 		var retJSON = {
@@ -774,7 +795,11 @@
 			},
 			"data": JSON.stringify(retJSON)
 		})
-		.done(function(response){
+        .fail(function(){
+            showNotification("The current state could not be sent", "danger");
+        })
+        .done(function(response){
+            showNotification("A new solution has been obtained!", "success");
 			++currentAdaptationId;
 		});
 	});
