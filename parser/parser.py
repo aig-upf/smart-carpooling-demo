@@ -295,7 +295,7 @@ def solveSmartCarpoolingProblem(baseFolder, configFilePath, doPlan=False, output
 if __name__ == "__main__":
     args = getArguments()
     baseFolder = os.path.dirname(os.path.realpath(os.path.join(sys.argv[0], "..")))
-    solveSmartCarpoolingProblem(baseFolder, args.config, args.plan, args.json, args.visualize)
+    solveSmartCarpoolingProblem(baseFolder, args.config, args.plan, args.json, args.visualize, args.time, args.memory, args.iterated)
 
 '''
     (46.0643, 46.0715, 11.1164, 11.1272) # 1125 nodes
