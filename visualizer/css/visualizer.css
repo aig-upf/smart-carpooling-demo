@@ -34,14 +34,6 @@
 	max-height: 56px;
 }
 
-#back-timestamp-button {
-	display: none;
-}
-
-#num-block-random-link, #num-block-planned-link, #toggling-probability {
-	text-align: right;
-}
-
 #distance-chart, #distance-chart-selfish {
 	width: 100%;
 }
@@ -56,4 +48,8 @@
 	animation-name: highlight;
 	animation-duration: 2s;
 	animation-iteration-count: infinite;
+}
+
+#selfishChart {
+    display: none;
 }

@@ -64,6 +64,7 @@ def getLastSelfishPlan():
 @app.route("/run_adaptation", methods=['GET', 'POST'])
 def runAdaptation():
     parser.solveSmartCarpoolingProblemWithAdaptations(baseFolder, "random_init.json", request.json, True, True, True)
+    # parser.solveSmartCarpoolingProblemWithAdaptations(baseFolder, "random_init.json", request.json, True, True, True, isCollectiveAdaptation=False)
     return "Sucess"
 
 

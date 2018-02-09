@@ -45,8 +45,8 @@
 
 	function readPlan(){
 		readCollectivePlan();
-		if (lastCollectiveRead)
-			readSelfishPlan();
+		//if (lastCollectiveRead)
+		//	readSelfishPlan();
 	}
 
 	function readCollectivePlan() {
@@ -155,6 +155,7 @@
 	function showPreviousMap(){
 		if (currentTimestampIndex > 0) {
 			currentTimestampIndex -= 1;
+            showUpdatedDistances();
 			showMap();
 		}
 	}
@@ -162,22 +163,8 @@
 	function showNextMap(){
 		if (currentTimestampIndex < timestampSteps.length - 1) {
 			currentTimestampIndex += 1;
-
 			showUpdatedDistances();
-
-			if ($("#toggle-block-link-on-step").is(":checked")) {
-				var randomInt = getRandomInt(0, 100);
-				var selectedProbability = parseInt($("#toggling-probability").val());
-				if (randomInt <= selectedProbability) {
-					toggleBlockRandomPlannedLinks(1);
-				}
-				else {
-					showMap();
-				}
-			}
-			else {
-				showMap();
-			}
+			showMap();
 		}
 		else {
 			stopPlayInterval();
@@ -640,27 +627,6 @@
 		toggleBlockLink(randomLink["start"], randomLink["end"], [randomLink["start_coordinates"], randomLink["end_coordinates"]]);
 	}
 
-	function toggleBlockRandomLinks(numBlocked){
-		for (var i = 0; i < numBlocked; ++i) {
-			toggleBlockRandomLink();
-		}
-
-		if (numBlocked > 0) {
-			showMap();
-		}
-	}
-
-	function toggleBlockRandomPlannedLinks(numBlocked){
-		for (var i = 0; i < numBlocked; ++i) {
-			var randPlanLink = planLinks[getRandomInt(0, planLinks.length - 1)];
-			toggleBlockLink(randPlanLink["start"], randPlanLink["end"], [randPlanLink["start_coordinates"], randPlanLink["end_coordinates"]]);
-		}
-
-		if (numBlocked > 0) {
-			showMap();
-		}
-	}
-
 	function highlightAgentAndEnsembles(agentId, doHighlight){
 		var agentsToHighlight = [agentId];
 		if (ensemblesData != null && ensemblesData[agentId] != null) {
@@ -802,16 +768,6 @@
             showNotification("A new solution has been obtained!", "success");
 			++currentAdaptationId;
 		});
-	});
-
-	$(document).on("click", "#toggle-block-random-link-button", function(){
-		var numBlocked = parseInt($("#num-block-random-link").val());
-		toggleBlockRandomLinks(numBlocked);
-	});
-
-	$(document).on("click", "#toggle-block-planned-link-button", function(){
-		var numBlocked = parseInt($("#num-block-planned-link").val());
-		toggleBlockRandomPlannedLinks(numBlocked);
 	});
 
 	$(document).on("mouseover", ".legend-item", function(e){

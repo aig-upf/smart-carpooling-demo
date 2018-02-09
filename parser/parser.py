@@ -222,7 +222,7 @@ def solveCooperativeProblem(mapParser, configObj, baseFolder, argTime, argMemory
     runPlanner(baseFolder, argTime, argMemory, problemFileName, planFilePrefix, argIteratedSolution)
 
 
-def modifConfigurationWithAdaptations(configObj, adaptations):
+def modifyConfigurationWithAdaptations(configObj, adaptations):
     if (adaptations is not None) and (adaptations["adaptations"] is not None):
         blockedStreets = adaptations["adaptations"]["blocked_streets"]
         if blockedStreets is not None:
@@ -253,18 +253,19 @@ def createSelfishConfigurationFromCooperative(cooperativeConfigObj):
     return selfishConfigObj
 
 
-def solveSmartCarpoolingProblemWithAdaptations(baseFolder, configFilePath, adaptations, doPlan=False, outputJSON=False, outputGeoJSON=False, timeLimit=3600, memoryLimit=4096, iteratedSolution=False):
+def solveSmartCarpoolingProblemWithAdaptations(baseFolder, configFilePath, adaptations, doPlan=False, outputJSON=False, outputGeoJSON=False, timeLimit=3600, memoryLimit=4096, iteratedSolution=False, isCollectiveAdaptation=True):
     configObj = parseConfigFile(configFilePath)
-    modifConfigurationWithAdaptations(configObj, adaptations)
+    modifyConfigurationWithAdaptations(configObj, adaptations)
     with open("cooperative_scenario.json", 'w') as f:
         json.dump(configObj, f, indent=4)
 
-    selfishConfigObj = createSelfishConfigurationFromCooperative(configObj)
-    with open("selfish_scenario.json", 'w') as f:
-        json.dump(selfishConfigObj, f, indent=4)
-
-    solveSmartCarpoolingProblem(baseFolder, "cooperative_scenario.json", doPlan, outputJSON, outputGeoJSON, timeLimit, memoryLimit, iteratedSolution)
-    solveSmartCarpoolingProblem(baseFolder, "selfish_scenario.json", doPlan, outputJSON, outputGeoJSON, timeLimit, memoryLimit, iteratedSolution)
+    if isCollectiveAdaptation:
+        solveSmartCarpoolingProblem(baseFolder, "cooperative_scenario.json", doPlan, outputJSON, outputGeoJSON, timeLimit, memoryLimit, iteratedSolution)
+    else:
+        selfishConfigObj = createSelfishConfigurationFromCooperative(configObj)
+        with open("selfish_scenario.json", 'w') as f:
+            json.dump(selfishConfigObj, f, indent=4)
+        solveSmartCarpoolingProblem(baseFolder, "selfish_scenario.json", doPlan, outputJSON, outputGeoJSON, timeLimit, memoryLimit, iteratedSolution)
 
 
 def solveSmartCarpoolingProblem(baseFolder, configFilePath, doPlan=False, outputJSON=False, outputGeoJSON=False, timeLimit=3600, memoryLimit=4096, iteratedSolution=False):
