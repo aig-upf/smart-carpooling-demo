@@ -18,7 +18,7 @@ public class MultiagentPlannerCaller {
 
 		try {
 			String planCmd = scriptPath
-					+ "solver.py --plan --json --visualize --time "
+					+ "solver.py --json --geojson --time "
 					+ numSeconds + " --memory " + numMegabytes + " "
 					+ configPath;
 
