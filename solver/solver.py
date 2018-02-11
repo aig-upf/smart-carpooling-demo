@@ -7,9 +7,9 @@ import os, shutil
 import time
 from multiprocessing import Process
 
-from osmutils import *
-from pddlutils import *
-from planutils import *
+from utils.osmutils import *
+from utils.pddlutils import *
+from utils.planutils import *
 
 
 def getArguments():

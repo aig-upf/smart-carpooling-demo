@@ -1,5 +1,5 @@
 {
-	"map_path": "../../trento/Trento.world",
+	"map_path": "../../data/Trento.world",
 	"map_boundaries": {
 		"min_latitude": 46.0643,
 		"max_latitude": 46.0715,

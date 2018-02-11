@@ -2,8 +2,8 @@
 
 import argparse
 import json
-from osmutils import *
-from carutils import *
+from utils.osmutils import *
+from utils.carutils import *
 from random import randint
 try:
     from queue import Queue

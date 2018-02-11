@@ -4,7 +4,7 @@ import os, time, json, sys
 from flask import Flask, request
 from flask_cors import CORS, cross_origin
 
-import randominit, parser
+import randominit, solver
 
 app = Flask(__name__)
 CORS(app)
@@ -20,7 +20,7 @@ baseFolder = None
 @app.route("/generate_scenario", methods=['GET', 'POST'])
 def generateRandomScenerario():
     requestObj = request.json
-    randominit.generateRandomScenerario("../trento/Trento.world", \
+    randominit.generateRandomScenerario(os.path.join(baseFolder, "data/Trento.world"), \
                                         requestObj["passengers"], \
                                         requestObj["carpools"], \
                                         requestObj["min_latitude"], \
@@ -29,7 +29,7 @@ def generateRandomScenerario():
                                         requestObj["max_longitude"], \
                                         requestObj["min_walk_range"], \
                                         requestObj["max_walk_range"])
-    parser.solveSmartCarpoolingProblem(baseFolder, "random_init.json", True, True, True)
+    solver.solveSmartCarpoolingProblem(baseFolder, "random_init.json", True, True, True)
     return "Success"
 
 
@@ -63,8 +63,8 @@ def getLastSelfishPlan():
 
 @app.route("/run_adaptation", methods=['GET', 'POST'])
 def runAdaptation():
-    parser.solveSmartCarpoolingProblemWithAdaptations(baseFolder, "random_init.json", request.json, True, True, True)
-    # parser.solveSmartCarpoolingProblemWithAdaptations(baseFolder, "random_init.json", request.json, True, True, True, isCollectiveAdaptation=False)
+    solver.solveSmartCarpoolingProblemWithAdaptations(baseFolder, "random_init.json", request.json, True, True, True)
+    # solver.solveSmartCarpoolingProblemWithAdaptations(baseFolder, "random_init.json", request.json, True, True, True, isCollectiveAdaptation=False)
     return "Sucess"
 
 
@@ -90,4 +90,5 @@ def setBaseFolder(currentFolder):
 if __name__ == "__main__":
     removeGeoJSONFiles()
     setBaseFolder(sys.argv[0])
+    print baseFolder
     app.run()
