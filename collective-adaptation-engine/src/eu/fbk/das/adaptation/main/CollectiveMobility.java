@@ -146,9 +146,9 @@ public class CollectiveMobility {
 			} else {
 
 				// Ensemble Creation using Randominit.py
-				String scriptPath = WORKING_DIR_NAME + "/parser/";
-				String worldPath = WORKING_DIR_NAME + "/trento/";
-				String carDataPath = WORKING_DIR_NAME + "/trento/cardata.xlsx";
+				String scriptPath = WORKING_DIR_NAME + "/solver/";
+				String worldPath = WORKING_DIR_NAME + "/data/";
+				String carDataPath = WORKING_DIR_NAME + "/data/cardata.xlsx";
 
 				boolean created = false;
 				// while (!created) {
@@ -488,7 +488,7 @@ public class CollectiveMobility {
 
 		// properties
 
-		jsonObject.addProperty("map_path", WORKING_DIR_NAME + "/trento/Trento.world");
+		jsonObject.addProperty("map_path", WORKING_DIR_NAME + "/data/Trento.world");
 		JsonObject boundaries = new JsonObject();
 
 		boundaries.addProperty("min_latitude", minlat);
@@ -516,7 +516,7 @@ public class CollectiveMobility {
 		// respective agents
 		// involved
 
-		String scriptPath = WORKING_DIR_NAME + "/parser/";
+		String scriptPath = WORKING_DIR_NAME + "/solver/";
 		String configPath = WORKING_DIR_NAME + "/collective-adaptation-engine/configTest.json";
 
 		JsonArray resArray = MultiagentPlannerCaller.plan(scriptPath,
@@ -706,7 +706,7 @@ public class CollectiveMobility {
 
 		// properties
 
-		jsonObject.addProperty("map_path", WORKING_DIR_NAME + "/trento/Trento.world");
+		jsonObject.addProperty("map_path", WORKING_DIR_NAME + "/data/Trento.world");
 		JsonObject boundaries = new JsonObject();
 
 		boundaries.addProperty("min_latitude", minlat);
@@ -737,7 +737,7 @@ public class CollectiveMobility {
 		// respective agents
 		// involved
 
-		String scriptPath = WORKING_DIR_NAME + "/parser/";
+		String scriptPath = WORKING_DIR_NAME + "/solver/";
 		String configPath = WORKING_DIR_NAME + "/collective-adaptation-engine/configTest.json";
 
 		// 120 (30) seconds to solve this problem
@@ -1751,7 +1751,7 @@ public class CollectiveMobility {
 		// create the config.json
 		JsonObject config = new JsonObject();
 		// add a property call title to the albums object
-		config.addProperty("map_path", WORKING_DIR_NAME + "/trento/Trento.world");
+		config.addProperty("map_path", WORKING_DIR_NAME + "/data/Trento.world");
 
 		// create the boundaries
 		JsonObject boundaries = new JsonObject();
@@ -1790,7 +1790,7 @@ public class CollectiveMobility {
 		// call the AI planner to create ensembles (2 car pools with the
 		// respective passengers)
 
-		String scriptPath = WORKING_DIR_NAME + "/parser/";
+		String scriptPath = WORKING_DIR_NAME + "/solver/";
 		String configPath = WORKING_DIR_NAME + "/collective-adaptation-engine/configTest.json";
 
 		// 120 (5) seconds to solve this problem
