@@ -1,4 +1,4 @@
-(define (problem p01saso)
+(define (problem p02)
 (:domain journey-planner)
 (:objects
 	c1 - carpool
