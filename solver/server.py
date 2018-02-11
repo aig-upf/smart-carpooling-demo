@@ -29,7 +29,7 @@ def generateRandomScenerario():
                                         requestObj["max_longitude"], \
                                         requestObj["min_walk_range"], \
                                         requestObj["max_walk_range"])
-    solver.solveSmartCarpoolingProblem(baseFolder, "random_init.json", True, True)
+    solver.solveSmartCarpoolingProblem(baseFolder, "random_init.json", outputGeoJSON=True)
     return "Success"
 
 
@@ -63,8 +63,8 @@ def getLastSelfishPlan():
 
 @app.route("/run_adaptation", methods=['GET', 'POST'])
 def runAdaptation():
-    solver.solveSmartCarpoolingProblemWithAdaptations(baseFolder, "random_init.json", request.json, True, True)
-    # solver.solveSmartCarpoolingProblemWithAdaptations(baseFolder, "random_init.json", request.json, True, True, isCollectiveAdaptation=False)
+    solver.solveSmartCarpoolingProblemWithAdaptations(baseFolder, "random_init.json", request.json, outputGeoJSON=True)
+    # solver.solveSmartCarpoolingProblemWithAdaptations(baseFolder, "random_init.json", request.json, outputGeoJSON=True, isCollectiveAdaptation=False)
     return "Sucess"
 
 
