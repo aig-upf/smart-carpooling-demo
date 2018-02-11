@@ -15,11 +15,10 @@ from utils.planutils import *
 def getArguments():
     argParser = argparse.ArgumentParser()
     argParser.add_argument("config", help="JSON configuration file to create the problem")
-    argParser.add_argument("--plan", "-p", default=False, action="store_true", help="launch a planning algorithm to solve the generated problem")
     argParser.add_argument("--json", "-j", default=False, action="store_true", help="convert resulting problem into JSON file")
     argParser.add_argument("--time", "-t", default=3600, help="maximum number of seconds during which the planner will run (default: 3600 seconds)")
     argParser.add_argument("--memory", "-m", default=4096, help="maximum amount of memory in MiB to be used by the planner (default: 4096 MiB)")
-    argParser.add_argument("--visualize", "-v", default=False, action="store_true", help="show a map with the planned route")
+    argParser.add_argument("--geojson", "-g", default=False, action="store_true", help="convert resulting problem into GeoJSON file (used for a visualizer)")
     argParser.add_argument("--iterated", dest="iterated", action="store_true", help="look for more solutions after finding the first one")
     argParser.add_argument("--no-iterated", dest="iterated", action="store_false", help="stop after finding the first solution")
     argParser.set_defaults(iterated=False)
@@ -253,50 +252,49 @@ def createSelfishConfigurationFromCooperative(cooperativeConfigObj):
     return selfishConfigObj
 
 
-def solveSmartCarpoolingProblemWithAdaptations(baseFolder, configFilePath, adaptations, doPlan=False, outputJSON=False, outputGeoJSON=False, timeLimit=3600, memoryLimit=4096, iteratedSolution=False, isCollectiveAdaptation=True):
+def solveSmartCarpoolingProblemWithAdaptations(baseFolder, configFilePath, adaptations, outputJSON=False, outputGeoJSON=False, timeLimit=3600, memoryLimit=4096, iteratedSolution=False, isCollectiveAdaptation=True):
     configObj = parseConfigFile(configFilePath)
     modifyConfigurationWithAdaptations(configObj, adaptations)
     with open("cooperative_scenario.json", 'w') as f:
         json.dump(configObj, f, indent=4)
 
     if isCollectiveAdaptation:
-        solveSmartCarpoolingProblem(baseFolder, "cooperative_scenario.json", doPlan, outputJSON, outputGeoJSON, timeLimit, memoryLimit, iteratedSolution)
+        solveSmartCarpoolingProblem(baseFolder, "cooperative_scenario.json", outputJSON, outputGeoJSON, timeLimit, memoryLimit, iteratedSolution)
     else:
         selfishConfigObj = createSelfishConfigurationFromCooperative(configObj)
         with open("selfish_scenario.json", 'w') as f:
             json.dump(selfishConfigObj, f, indent=4)
-        solveSmartCarpoolingProblem(baseFolder, "selfish_scenario.json", doPlan, outputJSON, outputGeoJSON, timeLimit, memoryLimit, iteratedSolution)
+        solveSmartCarpoolingProblem(baseFolder, "selfish_scenario.json", outputJSON, outputGeoJSON, timeLimit, memoryLimit, iteratedSolution)
 
 
-def solveSmartCarpoolingProblem(baseFolder, configFilePath, doPlan=False, outputJSON=False, outputGeoJSON=False, timeLimit=3600, memoryLimit=4096, iteratedSolution=False):
+def solveSmartCarpoolingProblem(baseFolder, configFilePath, outputJSON=False, outputGeoJSON=False, timeLimit=3600, memoryLimit=4096, iteratedSolution=False):
     configObj = parseConfigFile(configFilePath)
 
     mapParser = OpenStreeMapParser()
     parseMapFile(mapParser, configObj["map_path"], configFilePath)
     exportLabelCorrespondences(mapParser)
 
-    if doPlan:
-        solutionType = "cooperative"
-        if "solution_type" in configObj:
-            solutionType = configObj["solution_type"]
-        if solutionType == "cooperative":
-            solveCooperativeProblem(mapParser, configObj, baseFolder, timeLimit, memoryLimit, iteratedSolution)
-        elif solutionType == "selfish":
-            solveSelfishProblem(mapParser, configObj, baseFolder, timeLimit, memoryLimit)
-        else:
-            print "Error: Incorrect solution type"
-            exit(-1)
+    solutionType = "cooperative"
+    if "solution_type" in configObj:
+        solutionType = configObj["solution_type"]
+    if solutionType == "cooperative":
+        solveCooperativeProblem(mapParser, configObj, baseFolder, timeLimit, memoryLimit, iteratedSolution)
+    elif solutionType == "selfish":
+        solveSelfishProblem(mapParser, configObj, baseFolder, timeLimit, memoryLimit)
+    else:
+        print "Error: Incorrect solution type"
+        exit(-1)
 
-        if outputJSON:
-            convertAllPlansToJSON(mapParser, configObj)
-        if outputGeoJSON:
-            convertLastPlanToGeoJSON(mapParser, configObj)
+    if outputJSON:
+        convertAllPlansToJSON(mapParser, configObj)
+    if outputGeoJSON:
+        convertLastPlanToGeoJSON(mapParser, configObj)
 
 
 if __name__ == "__main__":
     args = getArguments()
     baseFolder = os.path.dirname(os.path.realpath(os.path.join(sys.argv[0], "..")))
-    solveSmartCarpoolingProblem(baseFolder, args.config, args.plan, args.json, args.visualize, args.time, args.memory, args.iterated)
+    solveSmartCarpoolingProblem(baseFolder, args.config, args.json, args.geojson, args.time, args.memory, args.iterated)
 
 '''
     (46.0643, 46.0715, 11.1164, 11.1272) # 1125 nodes
