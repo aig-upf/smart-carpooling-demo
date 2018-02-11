@@ -90,5 +90,4 @@ def setBaseFolder(currentFolder):
 if __name__ == "__main__":
     removeGeoJSONFiles()
     setBaseFolder(sys.argv[0])
-    print baseFolder
     app.run()
