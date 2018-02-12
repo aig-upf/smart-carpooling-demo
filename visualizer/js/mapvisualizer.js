@@ -736,7 +736,8 @@
         })
         .done(function(response){
             showNotification("Scenario successfully generated!", "success");
-            // $("#open-scenario-config-button").prop("disabled", true);  // block button on success
+            $("#open-scenario-config-button").prop("disabled", true);  // block button on success
+            $("#send-current-state-button").prop("disabled", false);
         });
     });
 
