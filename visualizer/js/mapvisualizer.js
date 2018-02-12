@@ -375,8 +375,8 @@
             var div = L.DomUtil.create('div', 'info legend');
             var labels = ["<strong>Legend</strong>"];
 
-            for (var i = 0; i < agentNames.length; ++i){
-                var agentId = agentNames[i];
+            for (var a = 0; a < agentNames.length; ++a){
+                var agentId = agentNames[a];
                 var col = agentColours[agentId];
                 var infoText = "";
                 if (ensemblesData != null && ensemblesData[agentId] != null && ensemblesData[agentId].length > 0) {
@@ -737,7 +737,7 @@
         })
         .done(function(response){
             showNotification("Scenario successfully generated!", "success");
-            //$("#open-scenario-config-button").prop("disabled", true);  // block button on success
+            // $("#open-scenario-config-button").prop("disabled", true);  // block button on success
             $("#send-current-state-button").prop("disabled", false);
         });
     });
