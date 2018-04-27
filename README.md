@@ -155,7 +155,7 @@ This file opens uses the port `5000` to receive the calls from the visualizer.
 
 ![Image of the visualizer](doc/img/visualiser_full.png)
 
-You can see a demo of the visualizer in the following [link](https://youtu.be/aSRF6AdUHjs).
+You can see a demo of the visualizer in the following [link](https://youtu.be/omWu3FpZNsI).
 
 ## <a name="credits"></a>Credits
 
