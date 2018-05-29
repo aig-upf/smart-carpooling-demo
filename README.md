@@ -1,4 +1,4 @@
-# Smart Carpooling Demo
+# Smart Carpooling Demo [![DOI](https://zenodo.org/badge/92186554.svg)](https://zenodo.org/badge/latestdoi/92186554)
 
 This documentation aims to explain how the planning experiments in the *smart mobility* domain can be run.
 
