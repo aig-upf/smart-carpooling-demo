@@ -167,9 +167,9 @@ The code for creating and solving smart mobility problems has been written by:
 
 ## <a name="references"></a>References
 
-* <a name="ref-aamas2018-extended-abstract">Bucchiarone, A., Furelos-Blanco, D., Jonsson, A., Khandokar, F., and Mourshed, M. (2018).</a> _Collective Adaptation through Concurrent Planning: the Case of Sustainable Urban Mobility_. Proc. of the 17th International Conference on Autonomous Agents and Multiagent Systems
+* <a name="ref-aamas2018-extended-abstract">Bucchiarone, A., Furelos-Blanco, D., Jonsson, A., Khandokar, F., and Mourshed, M. (2018).</a> [_Collective Adaptation through Concurrent Planning: the Case of Sustainable Urban Mobility_](http://ifaamas.org/Proceedings/aamas2018/pdfs/p1880.pdf). Proc. of the 17th International Conference on Autonomous Agents and Multiagent Systems
 (AAMAS 2018).
 
-* <a name="ref-aamas2018-demo-paper">Furelos-Blanco, D., Bucchiarone, A., and Jonsson, A. (2018).</a> _CARPooL: Collective Adaptation using concuRrent PLanning_. Proc. of the 17th International Conference on Autonomous Agents and Multiagent Systems
+* <a name="ref-aamas2018-demo-paper">Furelos-Blanco, D., Bucchiarone, A., and Jonsson, A. (2018).</a> [_CARPooL: Collective Adaptation using concuRrent PLanning_](http://ifaamas.org/Proceedings/aamas2018/pdfs/p1815.pdf). Proc. of the 17th International Conference on Autonomous Agents and Multiagent Systems
 (AAMAS 2018).
 
